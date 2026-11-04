@@ -1,4 +1,5 @@
 using System;
+using Gumby.Tasks;
 using Gumby.Views;
 
 namespace Gumby.Views
@@ -82,7 +83,9 @@ namespace Gumby.Views
             }
 
             // Format WiFi connection string (bez WIFI: prefiksa)
-            var wifiData = $"S:{ssid};T:{encryption};P:{password};;";
+            var wifiData = $"S:{WifiConnectionTaskService.EscapeWifiValue(ssid)};" +
+                           $"T:{encryption};" +
+                           $"P:{WifiConnectionTaskService.EscapeWifiValue(password ?? "")};;";
             var commandData = $"7|{Uri.EscapeDataString(wifiData)}";
             var displayText = $"📶 WiFi: {ssid}";
 

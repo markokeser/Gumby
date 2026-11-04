@@ -1,9 +1,5 @@
-﻿#if ANDROID
-using Android.AdServices.Common;
-#endif
-using Gumby.Tasks;
+﻿using Gumby.Tasks;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -13,12 +9,18 @@ namespace Gumby.Services
 {
     public class ChipService
     {
-        public static void HandleNfcTagDiscovered(string tagData)
+        /// <summary>
+        /// Izvršava sve komande sa čipa, jednu po jednu, redosledom kojim su upisane.
+        /// </summary>
+        public static async Task HandleNfcTagDiscovered(string tagData)
         {
-                var tasks = tagData.Split('\x1F');
+            if (string.IsNullOrWhiteSpace(tagData))
+                return;
+
+            var tasks = tagData.Split(CommandCodes.TaskSeparator);
             foreach (var task in tasks)
             {
-                DoTask(task);
+                await DoTask(task);
             }
         }
 
@@ -27,125 +29,83 @@ namespace Gumby.Services
             try
             {
                 if (string.IsNullOrWhiteSpace(tagData))
-                {
-                    //    await ShowAlert("Empty Tag", "NFC tag contains no data.");
                     return;
-                }
 
                 var parts = tagData.Split('|');
-                var command = parts.Length > 0 ? parts[0] : "";
+                var command = parts[0];
                 var value = parts.Length > 1 ? string.Join("|", parts.Skip(1)) : "";
 
                 switch (command)
                 {
-                    //URL
-                    case "0":
-                        LinkTaskService.OpenUrl(value);
+                    case CommandCodes.Base64:
+                        // Komanda je upisana kao base64 jer je sadržala separator komandi
+                        var decoded = Encoding.UTF8.GetString(Convert.FromBase64String(value));
+                        await DoTask(decoded);
                         break;
 
-                    // VOLUME & SOUND (RINGTONE, MEDIA, MUTE, UNMUTE, VIBRATE)
-                    case "1": // Volume komanda (format: 1|0|50, 1|1|75, 1|2, 1|3, 1|4)
-                        var volumeParts = value.Split('|');
-                        var volumeType = volumeParts[0]; // "0"=ringtone, "1"=media, "2"=mute, "3"=unmute, "4"=vibrate
-
-                        if (volumeType == "0" || volumeType == "1")
-                        {
-                            // Volume komande (imaju nivo jačine)
-                            var volumeLevel = volumeParts.Length > 1 ? volumeParts[1] : "50";
-                            if (int.TryParse(volumeLevel, out int level))
-                            {
-                                if (volumeType == "0")
-                                    await RingtoneTaskService.SetRingtoneVolume(level);
-                                else if (volumeType == "1")
-                                    await RingtoneTaskService.SetMediaVolume(level);
-                            }
-                        }
-                        else if (volumeType == "2")
-                        {
-                            // Mute
-                            await RingtoneTaskService.RingtoneMute();
-                        }
-                        else if (volumeType == "3")
-                        {
-                            // Unmute
-                            await RingtoneTaskService.RingtoneOn();
-                        }
-                        else if (volumeType == "4")
-                        {
-                            // Vibrate
-                            await RingtoneTaskService.RingtoneVibrate();
-                        }
+                    case CommandCodes.Url:
+                        await LinkTaskService.OpenUrl(value);
                         break;
 
-                    //CALL
-                    case "2":
-                        CallTaskService.CallNumber(value);
+                    // VOLUME & SOUND (format: 1|0|50, 1|1|75, 1|2, 1|3, 1|4)
+                    case CommandCodes.Volume:
+                        await HandleVolume(value);
                         break;
 
-                    case "SMS":
-                        var phoneNumber = value;
-                        MessageTaskService.SendMessage(phoneNumber);
+                    case CommandCodes.Call:
+                        await CallTaskService.CallNumber(value);
                         break;
 
-                    //SMS WITH MESSAGE
-                    case "3":
-                        parts = tagData.Split('|');
+                    // SMS (format: 3|telefon|poruka, oba URL-enkodovana)
+                    case CommandCodes.Sms:
                         var phone = parts.Length > 1 ? Uri.UnescapeDataString(parts[1]) : "";
                         var text = parts.Length > 2 ? Uri.UnescapeDataString(parts[2]) : "";
-                        MessageTaskService.SendMessage(phone, text);
+                        await MessageTaskService.SendMessage(phone, text);
                         break;
 
-                    //OPEN APP
-                    case "4":
-                        OpenAppTaskService.OpenApp(value);
+                    case CommandCodes.OpenApp:
+                        await OpenAppTaskService.OpenApp(value);
                         break;
 
-                    //SET ALARM
-                    case "5":
-                        AlarmTaskService.SetAlarm(value);
+                    case CommandCodes.SetAlarm:
+                        await AlarmTaskService.SetAlarm(value);
                         break;
 
-                    //START TIMER
-                    case "6": 
+                    case CommandCodes.StartTimer:
                         if (int.TryParse(value, out int seconds))
-                            TimerTaskService.StartTimer(seconds);
+                            await TimerTaskService.StartTimer(seconds);
                         break;
 
-                    //CONNECT TO WIFI
-                    case "7":
-                        WifiConnectionTaskService.ConnectToWifi(value);
+                    case CommandCodes.Wifi:
+                        await WifiConnectionTaskService.ConnectToWifi(value);
                         break;
 
-                    //ADD CONTACT
-                    case "8":
-                        AddContactTaskService.AddContact(value);
+                    case CommandCodes.Contact:
+                        await AddContactTaskService.AddContact(value);
                         break;
 
-                    case "10":
-                        BluetoothTaskService.HandleCommand(value); 
+                    case CommandCodes.Bluetooth:
+                        await BluetoothTaskService.HandleCommand(value);
                         break;
 
-                    case "11": // Spotify Playlist
-                               // Spotify package name: com.spotify.music
+                    case CommandCodes.Spotify:
                         await LinkTaskService.OpenUrlWithBrowser(value, "com.spotify.music");
                         break;
 
-                    case "12": // YouTube Playlist
-                               // YouTube package name: com.google.android.youtube
+                    case CommandCodes.YouTube:
                         await LinkTaskService.OpenUrlWithBrowser(value, "com.google.android.youtube");
                         break;
 
-                    case "13": // Instagram Reel
-                               // Instagram package name: com.instagram.android
+                    case CommandCodes.Instagram:
                         await LinkTaskService.OpenUrlWithBrowser(value, "com.instagram.android");
                         break;
 
-                    case "14": // Google Maps
+                    case CommandCodes.GoogleMaps:
                         await LinkTaskService.OpenUrlWithBrowser(value, "com.google.android.apps.maps");
                         break;
 
                     default:
-                        //   await ShowAlert("NFC", $"Command: {command}\nValue: {value}");
+                        Debug.WriteLine($">>> GUMBY: Unknown command '{command}'");
                         break;
                 }
             }
@@ -155,5 +115,34 @@ namespace Gumby.Services
             }
         }
 
+        private static async Task HandleVolume(string value)
+        {
+            var volumeParts = value.Split('|');
+            var volumeType = volumeParts[0]; // "0"=ringtone, "1"=media, "2"=mute, "3"=unmute, "4"=vibrate
+
+            switch (volumeType)
+            {
+                case "0":
+                case "1":
+                    var volumeLevel = volumeParts.Length > 1 ? volumeParts[1] : "50";
+                    if (int.TryParse(volumeLevel, out int level))
+                    {
+                        if (volumeType == "0")
+                            await RingtoneTaskService.SetRingtoneVolume(level);
+                        else
+                            await RingtoneTaskService.SetMediaVolume(level);
+                    }
+                    break;
+                case "2":
+                    await RingtoneTaskService.RingtoneMute();
+                    break;
+                case "3":
+                    await RingtoneTaskService.RingtoneOn();
+                    break;
+                case "4":
+                    await RingtoneTaskService.RingtoneVibrate();
+                    break;
+            }
+        }
     }
 }

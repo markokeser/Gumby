@@ -83,15 +83,11 @@ namespace Gumby.Tasks
                 var osVersion = (int)Build.VERSION.SdkInt;
                 Debug.WriteLine($">>> Android API Level: {osVersion}");
 
-                // For Android 12+ (API 31+): Use WifiNetworkSuggestion (Settings panel approach)
-                if (osVersion >= 31)
+                // Android 10+ (API 29+): WifiConfiguration/AddNetwork vraća -1 za aplikacije
+                // koje ciljaju Android 10+, pa je WifiNetworkSuggestion jedini podržan način
+                if (osVersion >= 29)
                 {
                     await ConnectViaWifiNetworkSuggestion(context, wifiManager, ssid, encryption, password);
-                }
-                // For Android 10-11: Use direct network configuration
-                else if (osVersion >= 29)
-                {
-                    await ConnectViaWifiConfiguration(context, wifiManager, ssid, encryption, password);
                 }
                 // For older Android: Legacy approach
                 else
@@ -114,54 +110,40 @@ namespace Gumby.Tasks
         {
             try
             {
-                Debug.WriteLine(">>> Using WifiNetworkSuggestion (Android 12+)");
+                Debug.WriteLine(">>> Using WifiNetworkSuggestion (Android 10+)");
 
-                // Check if WiFi is enabled
+                // Od Android 10 aplikacija ne može sama da uključi WiFi - otvori panel za korisnika
                 if (!wifiManager.IsWifiEnabled)
                 {
-                    var enable = await ShowAlertChoice("WiFi Disabled", 
-                        "WiFi is off. Enable it?", "Yes", "No");
-                    if (enable)
-                    {
-                        wifiManager.SetWifiEnabled(true);
-                        await Task.Delay(3000);
-                    }
-                    else
-                    {
+                    var enable = await ShowAlertChoice("WiFi Disabled",
+                        "WiFi is off. Open WiFi settings to turn it on?", "Yes", "No");
+                    if (!enable)
                         return;
-                    }
+
+                    OpenWifiSettings(context, usePanel: true);
                 }
 
-                // Create WifiNetworkSuggestion
+                var encryptionType = encryption.ToUpperInvariant();
+                var isOpen = string.IsNullOrEmpty(password) || encryptionType == "OPEN" || encryptionType == "NOPASS";
+
+                // WEP mreže nisu podržane preko WifiNetworkSuggestion API-ja
+                if (!isOpen && encryptionType == "WEP")
+                {
+                    await ShowAlert("WiFi Connection",
+                        $"WEP networks can't be added automatically.\n\nPlease connect to '{ssid}' manually.");
+                    OpenWifiSettings(context, usePanel: false);
+                    return;
+                }
+
                 var builder = new WifiNetworkSuggestion.Builder()
                     .SetSsid(ssid);
 
-                // Set password based on encryption type
-                if (!string.IsNullOrEmpty(password))
+                if (!isOpen)
                 {
-                    switch (encryption.ToUpper())
-                    {
-                        case "WPA":
-                        case "WPA2":
-                        case "WPA3":
-                            builder.SetWpa2Passphrase(password);
-                            break;
-                        case "WEP":
-                            Debug.WriteLine(">>> WEP encryption not supported, using WPA2");
-                            builder.SetWpa2Passphrase(password);
-                            break;
-                        case "NOPASS":
-                        case "OPEN":
-                            // No password for open networks
-                            break;
-                        default:
-                            builder.SetWpa2Passphrase(password);
-                            break;
-                    }
-                }
-                else if (encryption.ToUpper() != "OPEN" && encryption.ToUpper() != "NOPASS")
-                {
-                    builder.SetWpa2Passphrase("");
+                    if (encryptionType == "WPA3")
+                        builder.SetWpa3Passphrase(password);
+                    else
+                        builder.SetWpa2Passphrase(password);
                 }
 
                 var suggestion = builder.Build();
@@ -191,64 +173,20 @@ namespace Gumby.Tasks
             }
         }
 
-        /// <summary>
-        /// Android 10-11 (API 29-30): Use WifiConfiguration - legacy but still works
-        /// </summary>
-        private static async Task ConnectViaWifiConfiguration(Context context, WifiManager wifiManager, 
-            string ssid, string encryption, string password)
+        private static void OpenWifiSettings(Context context, bool usePanel)
         {
             try
             {
-                Debug.WriteLine(">>> Using WifiConfiguration (Android 10-11)");
-
-                if (!wifiManager.IsWifiEnabled)
-                {
-                    wifiManager.SetWifiEnabled(true);
-                    await Task.Delay(3000);
-                }
-
-                // Remove existing config
-                RemoveExistingNetwork(wifiManager, ssid);
-                await Task.Delay(500);
-
-                // Create config
-                var config = CreateWifiConfiguration(ssid, encryption, password);
-
-                var result = wifiManager.AddNetwork(config);
-                int netId = (int)result;
-                if (netId != -1)
-                {
-                    wifiManager.Disconnect();
-                    await Task.Delay(1000);
-
-                    wifiManager.EnableNetwork(netId, true);
-                    wifiManager.Reconnect();
-
-                    // CRITICAL: Wait for DHCP to assign IP address
-                    Debug.WriteLine(">>> Waiting for DHCP to assign IP...");
-                    await Task.Delay(5000);
-
-                    // Verify connection with IP
-                    var hasInternet = await VerifyInternetConnection(wifiManager, ssid, netId);
-                    
-                    if (hasInternet)
-                    {
-                        await ShowAlert("✓ Connected", $"Successfully connected to '{ssid}' with internet!");
-                    }
-                    else
-                    {
-                        await ShowAlert("⚠ Connected", $"Connected to '{ssid}' but internet may not be working.\n\nTry manually connecting in WiFi Settings.");
-                    }
-                }
-                else
-                {
-                    await ShowAlert("Error", $"Failed to add network '{ssid}'");
-                }
+                var action = usePanel
+                    ? Android.Provider.Settings.Panel.ActionWifi
+                    : Android.Provider.Settings.ActionWifiSettings;
+                var intent = new Intent(action);
+                intent.SetFlags(ActivityFlags.NewTask);
+                context.StartActivity(intent);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($">>> WifiConfiguration Error: {ex.Message}");
-                await ShowAlert("Error", $"Connection failed: {ex.Message}");
+                Debug.WriteLine($">>> OpenWifiSettings Error: {ex.Message}");
             }
         }
 
@@ -431,8 +369,9 @@ namespace Gumby.Tasks
 
         /// <summary>
         /// Parse WiFi data from format: WIFI:S:SSID;T:Encryption;P:Password;;
+        /// Specijalni znakovi (\ ; , : ") u vrednostima su escape-ovani sa "\".
         /// </summary>
-        private static (string ssid, string encryption, string password) ParseWifiData(string wifiData)
+        internal static (string ssid, string encryption, string password) ParseWifiData(string wifiData)
         {
             string ssid = "";
             string encryption = "";
@@ -440,25 +379,31 @@ namespace Gumby.Tasks
 
             try
             {
+                var data = wifiData.Trim();
+
+                // Gumby upisuje WiFi podatke URL-enkodovane (bez sirovih ";")
+                if (!data.Contains(';'))
+                    data = System.Uri.UnescapeDataString(data);
+
                 // Remove WIFI: prefix if present
-                var data = wifiData.StartsWith("WIFI:") ? wifiData.Substring(5) : wifiData;
+                if (data.StartsWith("WIFI:", StringComparison.OrdinalIgnoreCase))
+                    data = data.Substring(5);
 
-                // Split by semicolon
-                var parts = data.Split(';');
-                
-                foreach (var part in parts)
+                foreach (var part in SplitEscaped(data, ';'))
                 {
-                    if (string.IsNullOrEmpty(part)) continue;
+                    if (part.Length < 2 || part[1] != ':')
+                        continue;
 
-                    if (part.StartsWith("S:"))
-                        ssid = part.Substring(2);
-                    else if (part.StartsWith("T:"))
-                        encryption = part.Substring(2);
-                    else if (part.StartsWith("P:"))
-                        password = part.Substring(2);
+                    var value = Unescape(part.Substring(2));
+                    switch (char.ToUpperInvariant(part[0]))
+                    {
+                        case 'S': ssid = value; break;
+                        case 'T': encryption = value; break;
+                        case 'P': password = value; break;
+                    }
                 }
 
-                Debug.WriteLine($">>> Parsed - SSID: {ssid}, Type: {encryption}, Pass length: {password?.Length ?? 0}");
+                Debug.WriteLine($">>> Parsed - SSID: {ssid}, Type: {encryption}, Pass length: {password.Length}");
             }
             catch (Exception ex)
             {
@@ -466,6 +411,62 @@ namespace Gumby.Tasks
             }
 
             return (ssid, encryption, password);
+        }
+
+        /// <summary>
+        /// Escape-uje specijalne znakove WIFI formata (\ ; , : ").
+        /// </summary>
+        public static string EscapeWifiValue(string value)
+        {
+            var sb = new System.Text.StringBuilder(value.Length);
+            foreach (var c in value)
+            {
+                if (c == '\\' || c == ';' || c == ',' || c == ':' || c == '"')
+                    sb.Append('\\');
+                sb.Append(c);
+            }
+            return sb.ToString();
+        }
+
+        // Deli string po separatoru, ali ne po escape-ovanom separatoru ("\;")
+        private static List<string> SplitEscaped(string data, char separator)
+        {
+            var result = new List<string>();
+            var current = new System.Text.StringBuilder();
+
+            for (int i = 0; i < data.Length; i++)
+            {
+                var c = data[i];
+                if (c == '\\' && i + 1 < data.Length)
+                {
+                    current.Append(c).Append(data[i + 1]);
+                    i++;
+                }
+                else if (c == separator)
+                {
+                    result.Add(current.ToString());
+                    current.Clear();
+                }
+                else
+                {
+                    current.Append(c);
+                }
+            }
+
+            result.Add(current.ToString());
+            return result;
+        }
+
+        private static string Unescape(string value)
+        {
+            var sb = new System.Text.StringBuilder(value.Length);
+            for (int i = 0; i < value.Length; i++)
+            {
+                if (value[i] == '\\' && i + 1 < value.Length)
+                    i++;
+                sb.Append(value[i]);
+            }
+            return sb.ToString();
         }
 
         /// <summary>

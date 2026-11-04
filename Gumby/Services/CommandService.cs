@@ -7,7 +7,7 @@ namespace Gumby.Services
     public class CommandService
     {
         //INSERT CONTACT PART
-        public static string GenerateInsertContactCommand(string name, string phone, string email, string company)
+        public static string? GenerateInsertContactCommand(string name, string phone, string email, string company)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -20,7 +20,7 @@ namespace Gumby.Services
 
             // Encode for NFC
             var encodedData = Uri.EscapeDataString(vcard);
-            var commandData = $"8|{encodedData}";
+            var commandData = $"{CommandCodes.Contact}|{encodedData}";
 
             return commandData;
         }
@@ -47,25 +47,19 @@ namespace Gumby.Services
         //INSERT CALL PART
         public static string GenerateInsertCallCommand(string numberText)
         {
-            var commandData = $"2|{numberText}";
+            var commandData = $"{CommandCodes.Call}|{numberText}";
 
             return commandData;
         }
 
         //INSERT SMS PART
-        public static string GenerateInsertSmsCommand(string phoneNumber, string message) {
-            var commandData = "";
+        // Format: 3|<telefon>|<poruka>, oba dela URL-enkodovana (ChipService ih dekoduje)
+        public static string GenerateInsertSmsCommand(string phoneNumber, string message)
+        {
+            var encodedPhone = Uri.EscapeDataString(phoneNumber ?? "");
+            var encodedMessage = string.IsNullOrEmpty(message) ? "" : Uri.EscapeDataString(message);
 
-            if (string.IsNullOrEmpty(message))
-            {
-                commandData = $"3|{phoneNumber}|";
-            }
-            else
-            {
-                commandData = $"3|{phoneNumber}|{Uri.EscapeDataString(message)}";
-            }
-
-            return commandData;
+            return $"{CommandCodes.Sms}|{encodedPhone}|{encodedMessage}";
         }
 
     }

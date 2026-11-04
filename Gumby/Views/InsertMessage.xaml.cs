@@ -43,19 +43,9 @@ public partial class InsertMessage : ContentPage
 
         var message = MessageEntry.Text?.Trim();
 
-        string commandData;
-        string displayText;
-
-        if (string.IsNullOrEmpty(message))
-        {
-            commandData = $"3|{phoneNumber}";
-            displayText = $"💬 SMS to: {phoneNumber}";
-        }
-        else
-        {
-            commandData = $"3|{phoneNumber}|{message}";
-            displayText = $"💬 SMS to: {phoneNumber}";
-        }
+        // Broj i poruka se URL-enkoduju, pa "|" ili "%" u poruci ne kvare komandu
+        var commandData = CommandService.GenerateInsertSmsCommand(phoneNumber, message ?? "");
+        var displayText = $"💬 SMS to: {phoneNumber}";
 
         if (_returnToCaller && OnValueReturn != null)
         {
