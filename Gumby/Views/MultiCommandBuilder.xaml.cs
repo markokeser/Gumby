@@ -2,28 +2,12 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
-using Gumby.Views;
+using Gumby.Services;
 
 namespace Gumby.Views
 {
     public partial class MultiCommandBuilder : ContentPage
     {
-        // Mapa komandi u numeričke kodove
-        private static readonly Dictionary<string, int> CommandCodes = new()
-        {
-            { "URL", 0 },
-            { "VOLUME", 1 },
-            { "CALL", 2 },
-            { "SMS", 3 },
-            { "OPEN_APP", 4 },
-            { "SET_ALARM", 5 },
-            { "START_TIMER", 6 },
-            { "WIFI", 7 },
-            { "CONTACT", 8 },
-            { "BLUETOOTH", 10 },
-            { "VIBRATE", 11 }
-        };
-
         public ObservableCollection<CommandItem> Commands { get; set; }
         public ICommand RemoveCommand { get; }
 
@@ -75,7 +59,7 @@ namespace Gumby.Views
                     AddMuteCommand();
                     break;
                 case "📳 Vibrate":
-                    await AddVibrateCommand();
+                    AddVibrateCommand();
                     break;
                 case "💬 SMS":
                     await AddSmsCommand();
@@ -120,7 +104,7 @@ namespace Gumby.Views
             Commands.Add(new CommandItem
             {
                 Type = "BLUETOOTH",
-                Value = "10|1",  // On
+                Value = $"{CommandCodes.Bluetooth}|1",  // On
                 DisplayText = "🩸 Bluetooth ON"
             });
             break;
@@ -128,7 +112,7 @@ namespace Gumby.Views
             Commands.Add(new CommandItem
             {
                 Type = "BLUETOOTH",
-                Value = "10|0",  // Off
+                Value = $"{CommandCodes.Bluetooth}|0",  // Off
                 DisplayText = "🩸 Bluetooth OFF"
             });
             break;
@@ -136,7 +120,7 @@ namespace Gumby.Views
             Commands.Add(new CommandItem
             {
                 Type = "BLUETOOTH",
-                Value = "10|2",  // Toggle
+                Value = $"{CommandCodes.Bluetooth}|2",  // Toggle
                 DisplayText = "🩸 Bluetooth TOGGLE"
             });
             break;
@@ -177,23 +161,20 @@ namespace Gumby.Views
             Commands.Add(new CommandItem
             {
                 Type = "VOLUME",
-                Value = "1|2",  // Mute komanda
+                Value = $"{CommandCodes.Volume}|2",  // Mute komanda
                 DisplayText = "🔇 Mute"
             });
         }
 
-        private async Task AddVibrateCommand()
+        private void AddVibrateCommand()
         {
-            var sec = await DisplayPromptAsync("Vibrate", "Seconds:", keyboard: Keyboard.Numeric);
-            if (int.TryParse(sec, out int s))
+            // Prebacuje telefon u režim vibracije (bez trajanja - to nije podržano)
+            Commands.Add(new CommandItem
             {
-                Commands.Add(new CommandItem
-                {
-                    Type = "VOLUME",
-                    Value = $"1|4",  // Vibrate komanda
-                    DisplayText = $"📳 Vibrate {s}s"
-                });
-            }
+                Type = "VOLUME",
+                Value = $"{CommandCodes.Volume}|4",
+                DisplayText = "📳 Vibrate mode"
+            });
         }
 
         private async Task AddSmsCommand()
@@ -314,35 +295,28 @@ namespace Gumby.Views
                 return;
             }
 
-            // Kreiraj multi komandu sa separatorom \x1F
+            // Kreiraj multi komandu sa separatorom \x1F.
+            // Svaka vrednost već sadrži kod komande (npr. "0|https://...").
             var tasks = new List<string>();
 
             foreach (var cmd in Commands)
             {
-                if (CommandCodes.TryGetValue(cmd.Type, out int code))
+                if (string.IsNullOrEmpty(cmd.Value))
+                    continue;
+
+                if (cmd.Value.Contains(CommandCodes.TaskSeparator))
                 {
-                    string task;
-                    if (string.IsNullOrEmpty(cmd.Value))
-                    {
-                        task = code.ToString();
-                    }
-                    else
-                    {
-                        if (cmd.Value.Contains('\x1F'))    // || cmd.Value.Contains('|')
-                        {
-                            var encodedValue = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(cmd.Value));
-                            task = $"{code}|B64{encodedValue}";
-                        }
-                        else
-                        {
-                            task = $"{cmd.Value}";
-                        }
-                    }
-                    tasks.Add(task);
+                    // Separator u vrednosti bi pokvario podelu komandi - upiši celu komandu kao base64
+                    var encodedValue = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(cmd.Value));
+                    tasks.Add($"{CommandCodes.Base64}|{encodedValue}");
+                }
+                else
+                {
+                    tasks.Add(cmd.Value);
                 }
             }
 
-            var encodedTasks = string.Join("\x1F", tasks);
+            var encodedTasks = string.Join(CommandCodes.TaskSeparator, tasks);
             var nfcPage = new NfcWriterPage(encodedTasks, $"Multi: {Commands.Count} commands");
             await Navigation.PushAsync(nfcPage);
         }
@@ -355,8 +329,8 @@ namespace Gumby.Views
 
     public class CommandItem
     {
-        public string Type { get; set; }
-        public string Value { get; set; }
-        public string DisplayText { get; set; }
+        public string Type { get; set; } = "";
+        public string Value { get; set; } = "";
+        public string DisplayText { get; set; } = "";
     }
 }

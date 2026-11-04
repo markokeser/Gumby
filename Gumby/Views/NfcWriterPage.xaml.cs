@@ -29,16 +29,59 @@ public partial class NfcWriterPage : ContentPage
 
     private void SetWriteMode()
     {
-#if ANDROID
-        // JUST SET THESE VARIABLES - NOTHING ELSE
-        MainActivity.IsWriteModeActive = true;
-        MainActivity.PendingWriteText = _dataToWrite;
-        MainActivity.WriteCompletionSource = new TaskCompletionSource<bool>();
-
-        Debug.WriteLine($">>> Write mode set with: {_dataToWrite}");
-#endif
+        ArmWriteMode();
         StatusLabel.Text = "✅ Ready - Tap your NFC chip";
         StatusLabel.TextColor = Colors.LightGreen;
+    }
+
+    private void ArmWriteMode()
+    {
+#if ANDROID
+        var completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        MainActivity.PendingWriteText = _dataToWrite;
+        MainActivity.WriteCompletionSource = completion;
+        MainActivity.IsWriteModeActive = true;
+
+        Debug.WriteLine($">>> Write mode set with: {_dataToWrite}");
+
+        _ = WaitForWriteResultAsync(completion);
+#endif
+    }
+
+    private async Task WaitForWriteResultAsync(TaskCompletionSource<bool> completion)
+    {
+        bool success;
+        try
+        {
+            success = await completion.Task;
+        }
+        catch (TaskCanceledException)
+        {
+            // Stranica je zatvorena pre nego što je čip prislonjen
+            return;
+        }
+
+        await MainThread.InvokeOnMainThreadAsync(async () =>
+        {
+            if (success)
+            {
+                _timeoutCts?.Cancel();
+                StatusLabel.Text = "✅ Chip written successfully!";
+                StatusLabel.TextColor = Colors.LightGreen;
+
+                await Task.Delay(1200);
+                if (Navigation.NavigationStack.LastOrDefault() == this)
+                    await Navigation.PopAsync();
+            }
+            else
+            {
+                // Upis nije uspeo - ostavi stranicu otvorenu i omogući novi pokušaj
+                StatusLabel.Text = "❌ Write failed - tap the chip again";
+                StatusLabel.TextColor = Colors.Red;
+                ArmWriteMode();
+            }
+        });
     }
 
     private void ClearWriteMode()
@@ -47,6 +90,7 @@ public partial class NfcWriterPage : ContentPage
         // CLEAR VARIABLES
         MainActivity.IsWriteModeActive = false;
         MainActivity.PendingWriteText = null;
+        MainActivity.WriteCompletionSource?.TrySetCanceled();
         MainActivity.WriteCompletionSource = null;
 #endif
     }

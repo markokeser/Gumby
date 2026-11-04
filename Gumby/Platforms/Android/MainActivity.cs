@@ -77,28 +77,68 @@ namespace Gumby
             // READ MODE
             if (intent.Action == NfcAdapter.ActionNdefDiscovered)
             {
-                var rawMsgs = intent.GetParcelableArrayExtra(NfcAdapter.ExtraNdefMessages);
-                if (rawMsgs != null && rawMsgs.Length > 0)
-                {
-                    var msg = (NdefMessage)rawMsgs[0];
-                    if (msg.GetRecords().Length > 0)
-                    {
-                        var record = msg.GetRecords()[0];
-                        var payload = record.GetPayload();
-                        var tagData = System.Text.Encoding.UTF8.GetString(payload, 3, payload.Length - 3);
-                        ChipService.HandleNfcTagDiscovered(tagData);
+                var tagData = ReadTextRecord(intent);
+                if (tagData == null)
+                    return;
 
-                        // Zatvori samo ako je aplikacija pokrenuta iz zatvorenog stanja
-                        if (_shouldFinishAfterRead)
-                        {
-                            Finish();
-                        }
-                    }
-                }
+                // Zatvori samo ako je aplikacija pokrenuta iz zatvorenog stanja
+                var finishAfterRead = _shouldFinishAfterRead;
+                _ = ExecuteTagAsync(tagData, finishAfterRead);
             }
-            else if (intent.Action == NfcAdapter.ActionTagDiscovered)
+        }
+
+        /// <summary>
+        /// Čita prvi NDEF Text zapis. Payload format (NFC Forum RTD Text):
+        /// [status bajt][kod jezika][tekst], gde donjih 6 bitova status bajta
+        /// predstavlja dužinu koda jezika, a bit 7 označava UTF-16 kodiranje.
+        /// </summary>
+        private static string? ReadTextRecord(Intent intent)
+        {
+            var rawMsgs = intent.GetParcelableArrayExtra(NfcAdapter.ExtraNdefMessages);
+            if (rawMsgs == null || rawMsgs.Length == 0)
+                return null;
+
+            if (rawMsgs[0] is not NdefMessage msg)
+                return null;
+
+            var records = msg.GetRecords();
+            if (records == null || records.Length == 0)
+                return null;
+
+            var payload = records[0].GetPayload();
+            if (payload == null || payload.Length == 0)
+                return null;
+
+            var status = payload[0];
+            var languageLength = status & 0x3F;
+            var textStart = 1 + languageLength;
+            if (textStart > payload.Length)
+                return null;
+
+            var encoding = (status & 0x80) != 0
+                ? System.Text.Encoding.BigEndianUnicode
+                : System.Text.Encoding.UTF8;
+
+            return encoding.GetString(payload, textStart, payload.Length - textStart);
+        }
+
+        private async Task ExecuteTagAsync(string tagData, bool finishAfterRead)
+        {
+            try
             {
-                return;
+                await ChipService.HandleNfcTagDiscovered(tagData);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error executing tag: {ex.Message}");
+            }
+            finally
+            {
+                // Zatvori tek kada se sve komande izvrše
+                if (finishAfterRead)
+                {
+                    RunOnUiThread(() => Finish());
+                }
             }
         }
 
@@ -154,126 +194,112 @@ namespace Gumby
 
         private async void HandleWriteMode(Intent intent)
         {
+            // Preuzmi podatke odmah, da izmena statičkog stanja tokom upisa ne utiče na ovaj upis
+            var textToWrite = PendingWriteText;
+            var completion = WriteCompletionSource;
+            ResetWriteMode();
+
+            bool success = false;
             try
             {
-                // Get the native Android tag from intent
                 var nativeTag = intent.GetParcelableExtra(NfcAdapter.ExtraTag) as Android.Nfc.Tag;
-
-                if (nativeTag == null)
+                if (nativeTag == null || string.IsNullOrEmpty(textToWrite))
                 {
-                    RunOnUiThread(() => Toast.MakeText(this, "No tag detected", ToastLength.Short).Show());
-                    WriteCompletionSource?.TrySetResult(false);
-                    ResetWriteMode();
+                    ShowToast("No tag detected", ToastLength.Short);
                     return;
                 }
 
-                // Check what technologies the tag supports
-                var techList = nativeTag.GetTechList();
-                bool supportsNdef = false;
-                foreach (var tech in techList)
+                var techList = nativeTag.GetTechList() ?? Array.Empty<string>();
+                if (!techList.Contains("android.nfc.tech.Ndef") && !techList.Contains("android.nfc.tech.NdefFormatable"))
                 {
-                    if (tech == "android.nfc.tech.Ndef" || tech == "android.nfc.tech.NdefFormatable")
-                    {
-                        supportsNdef = true;
-                        break;
-                    }
-                }
-
-                if (!supportsNdef)
-                {
-                    RunOnUiThread(() => Toast.MakeText(this, "Tag doesn't support NDEF format", ToastLength.Long).Show());
-                    WriteCompletionSource?.TrySetResult(false);
-                    ResetWriteMode();
+                    ShowToast("Tag doesn't support NDEF format", ToastLength.Long);
                     return;
                 }
 
-                // IMPORTANT: Run the write operation on a background thread
-                await Task.Run(() =>
-                {
-                    try
-                    {
-                        RunOnUiThread(() => Toast.MakeText(this, "✍️ Writing to chip...", ToastLength.Short).Show());
+                ShowToast("✍️ Writing to chip...", ToastLength.Short);
 
-                        // ✅ KEY FIX: Try NdefFormatable FIRST for empty tags
-                        var formatable = Android.Nfc.Tech.NdefFormatable.Get(nativeTag);
-                        if (formatable != null)
-                        {
-                            try
-                            {
-                                formatable.Connect();
-                                var record = Android.Nfc.NdefRecord.CreateTextRecord("en", PendingWriteText);
-                                var message = new Android.Nfc.NdefMessage(new[] { record });
-                                formatable.Format(message);
-                                formatable.Close();
-
-                                RunOnUiThread(() => Toast.MakeText(this, "✅ Chip formatted and written!", ToastLength.Long).Show());
-                                WriteCompletionSource?.TrySetResult(true);
-                                return;
-                            }
-                            catch (Exception formatEx)
-                            {
-                                RunOnUiThread(() => Toast.MakeText(this, $"Format error: {formatEx.Message}", ToastLength.Short).Show());
-                                try { formatable.Close(); } catch { }
-                            }
-                        }
-
-                        // If not formatable or formatting failed, try Ndef for already-formatted tags
-                        var ndef = Android.Nfc.Tech.Ndef.Get(nativeTag);
-                        if (ndef != null)
-                        {
-                            try
-                            {
-                                ndef.Connect();
-
-                                // Check if writable
-                                if (!ndef.IsWritable)
-                                {
-                                    RunOnUiThread(() => Toast.MakeText(this, "Tag is read-only", ToastLength.Short).Show());
-                                    WriteCompletionSource?.TrySetResult(false);
-                                    ndef.Close();
-                                    return;
-                                }
-
-                                // Create NDEF record
-                                var record = Android.Nfc.NdefRecord.CreateTextRecord("en", PendingWriteText);
-                                var message = new Android.Nfc.NdefMessage(new[] { record });
-
-                                // Write to the chip
-                                ndef.WriteNdefMessage(message);
-                                ndef.Close();
-
-                                // Success
-                                RunOnUiThread(() => Toast.MakeText(this, "✅ Chip written successfully!", ToastLength.Long).Show());
-                                WriteCompletionSource?.TrySetResult(true);
-                            }
-                            catch (Exception ndefEx)
-                            {
-                                RunOnUiThread(() => Toast.MakeText(this, $"Write error: {ndefEx.Message}", ToastLength.Short).Show());
-                                WriteCompletionSource?.TrySetResult(false);
-                                try { ndef.Close(); } catch { }
-                            }
-                        }
-                        else
-                        {
-                            RunOnUiThread(() => Toast.MakeText(this, "Cannot write to this tag type", ToastLength.Long).Show());
-                            WriteCompletionSource?.TrySetResult(false);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        RunOnUiThread(() => Toast.MakeText(this, $"Write error: {ex.Message}", ToastLength.Short).Show());
-                        WriteCompletionSource?.TrySetResult(false);
-                    }
-                });
+                // I/O sa čipom ide na pozadinskoj niti
+                success = await Task.Run(() => WriteToTag(nativeTag, textToWrite));
             }
             catch (Exception ex)
             {
-                WriteCompletionSource?.TrySetResult(false);
+                ShowToast($"Write error: {ex.Message}", ToastLength.Short);
             }
             finally
             {
-                ResetWriteMode();
+                completion?.TrySetResult(success);
             }
+        }
+
+        private bool WriteToTag(Android.Nfc.Tag nativeTag, string text)
+        {
+            var record = NdefRecord.CreateTextRecord("en", text);
+            var message = new NdefMessage(new[] { record });
+            var messageSize = message.ToByteArray()?.Length ?? 0;
+
+            // Prazan čip: formatiraj i upiši
+            var formatable = NdefFormatable.Get(nativeTag);
+            if (formatable != null)
+            {
+                try
+                {
+                    formatable.Connect();
+                    formatable.Format(message);
+                    ShowToast("✅ Chip formatted and written!", ToastLength.Long);
+                    return true;
+                }
+                catch (Exception formatEx)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Format failed, trying NDEF write: {formatEx.Message}");
+                }
+                finally
+                {
+                    try { formatable.Close(); } catch { }
+                }
+            }
+
+            // Već formatiran čip
+            var ndef = Ndef.Get(nativeTag);
+            if (ndef == null)
+            {
+                ShowToast("Cannot write to this tag type", ToastLength.Long);
+                return false;
+            }
+
+            try
+            {
+                ndef.Connect();
+
+                if (!ndef.IsWritable)
+                {
+                    ShowToast("Tag is read-only", ToastLength.Short);
+                    return false;
+                }
+
+                if (messageSize > ndef.MaxSize)
+                {
+                    ShowToast($"Data too large for this chip ({messageSize} / {ndef.MaxSize} bytes)", ToastLength.Long);
+                    return false;
+                }
+
+                ndef.WriteNdefMessage(message);
+                ShowToast("✅ Chip written successfully!", ToastLength.Long);
+                return true;
+            }
+            catch (Exception ndefEx)
+            {
+                ShowToast($"Write error: {ndefEx.Message}", ToastLength.Short);
+                return false;
+            }
+            finally
+            {
+                try { ndef.Close(); } catch { }
+            }
+        }
+
+        private void ShowToast(string text, ToastLength length)
+        {
+            RunOnUiThread(() => Toast.MakeText(this, text, length)?.Show());
         }
 
         private void ResetWriteMode()
