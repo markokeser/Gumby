@@ -81,9 +81,14 @@ namespace Gumby
                 if (tagData == null)
                     return;
 
+                // Komande se pokreću odmah i nastavljaju da rade u pozadini
+                _ = ExecuteTagAsync(tagData);
+
                 // Zatvori samo ako je aplikacija pokrenuta iz zatvorenog stanja
-                var finishAfterRead = _shouldFinishAfterRead;
-                _ = ExecuteTagAsync(tagData, finishAfterRead);
+                if (_shouldFinishAfterRead)
+                {
+                    Finish();
+                }
             }
         }
 
@@ -122,7 +127,7 @@ namespace Gumby
             return encoding.GetString(payload, textStart, payload.Length - textStart);
         }
 
-        private async Task ExecuteTagAsync(string tagData, bool finishAfterRead)
+        private static async Task ExecuteTagAsync(string tagData)
         {
             try
             {
@@ -131,14 +136,6 @@ namespace Gumby
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error executing tag: {ex.Message}");
-            }
-            finally
-            {
-                // Zatvori tek kada se sve komande izvrše
-                if (finishAfterRead)
-                {
-                    RunOnUiThread(() => Finish());
-                }
             }
         }
 

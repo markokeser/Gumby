@@ -98,6 +98,9 @@ namespace Gumby.Views
         "🩸 Bluetooth Off",
         "🩸 Bluetooth Toggle");
 
+    if (action != null && action != "Cancel")
+        await Gumby.Tasks.BluetoothTaskService.EnsurePermissionAsync();
+
     switch (action)
     {
         case "🩸 Bluetooth On":

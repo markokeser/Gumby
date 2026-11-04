@@ -10,18 +10,21 @@ namespace Gumby.Services
     public class ChipService
     {
         /// <summary>
-        /// Izvršava sve komande sa čipa, jednu po jednu, redosledom kojim su upisane.
+        /// Pokreće sve komande sa čipa odmah, redosledom kojim su upisane.
+        /// Ne čeka da se jedna završi pre sledeće, tako da se sve pokrenu dok je
+        /// aktivnost još aktivna (Android blokira pokretanje ekrana iz pozadine).
         /// </summary>
-        public static async Task HandleNfcTagDiscovered(string tagData)
+        public static Task HandleNfcTagDiscovered(string tagData)
         {
             if (string.IsNullOrWhiteSpace(tagData))
-                return;
+                return Task.CompletedTask;
 
-            var tasks = tagData.Split(CommandCodes.TaskSeparator);
-            foreach (var task in tasks)
-            {
-                await DoTask(task);
-            }
+            var tasks = tagData
+                .Split(CommandCodes.TaskSeparator)
+                .Select(DoTask)
+                .ToList();
+
+            return Task.WhenAll(tasks);
         }
 
         private static async Task DoTask(string tagData)
