@@ -37,17 +37,6 @@ namespace Gumby.Tasks
                     return;
                 }
 
-                // Android 12+ traži BLUETOOTH_CONNECT dozvolu u toku rada
-                if (Build.VERSION.SdkInt >= BuildVersionCodes.S)
-                {
-                    var status = await MainThread.InvokeOnMainThreadAsync(() => Permissions.RequestAsync<Permissions.Bluetooth>());
-                    if (status != PermissionStatus.Granted)
-                    {
-                        await ShowAlert("Permission Denied", "Bluetooth permission is required.");
-                        return;
-                    }
-                }
-
                 var turnOn = enable ?? !adapter.IsEnabled;
                 if (turnOn == adapter.IsEnabled)
                 {
@@ -55,15 +44,30 @@ namespace Gumby.Tasks
                     return;
                 }
 
+                // Android 12+ traži BLUETOOTH_CONNECT dozvolu. Ne tražimo je ovde jer se čip
+                // čita u pozadini - traži se kada korisnik pravi Bluetooth komandu.
+                // Bez dozvole otvaramo Bluetooth podešavanja.
+                if (Build.VERSION.SdkInt >= BuildVersionCodes.S &&
+                    await Permissions.CheckStatusAsync<Permissions.Bluetooth>() != PermissionStatus.Granted)
+                {
+                    OpenBluetoothSettings(context);
+                    return;
+                }
+
                 // Android 13+: BluetoothAdapter.Enable()/Disable() više ne rade za obične aplikacije
                 // (uvek vraćaju false), pa korisniku otvaramo sistemski dijalog / podešavanja.
                 if (Build.VERSION.SdkInt >= BuildVersionCodes.Tiramisu)
                 {
-                    var intent = turnOn
-                        ? new Intent(BluetoothAdapter.ActionRequestEnable)
-                        : new Intent(Android.Provider.Settings.ActionBluetoothSettings);
-                    intent.SetFlags(ActivityFlags.NewTask);
-                    context.StartActivity(intent);
+                    if (turnOn)
+                    {
+                        var intent = new Intent(BluetoothAdapter.ActionRequestEnable);
+                        intent.SetFlags(ActivityFlags.NewTask);
+                        context.StartActivity(intent);
+                    }
+                    else
+                    {
+                        OpenBluetoothSettings(context);
+                    }
                     return;
                 }
 
@@ -78,6 +82,39 @@ namespace Gumby.Tasks
             {
                 Debug.WriteLine($"Bluetooth error: {ex.Message}");
                 await ShowAlert("Error", $"Failed: {ex.Message}");
+            }
+#else
+            await Task.CompletedTask;
+#endif
+        }
+
+#if ANDROID
+        private static void OpenBluetoothSettings(Context context)
+        {
+            var intent = new Intent(Android.Provider.Settings.ActionBluetoothSettings);
+            intent.SetFlags(ActivityFlags.NewTask);
+            context.StartActivity(intent);
+        }
+#endif
+
+        /// <summary>
+        /// Traži Bluetooth dozvolu (Android 12+). Poziva se iz aplikacije, kada korisnik
+        /// pravi Bluetooth komandu, da bi kasnije radila i kada se čip čita u pozadini.
+        /// </summary>
+        public static async Task EnsurePermissionAsync()
+        {
+#if ANDROID
+            if (Build.VERSION.SdkInt < BuildVersionCodes.S)
+                return;
+
+            try
+            {
+                if (await Permissions.CheckStatusAsync<Permissions.Bluetooth>() != PermissionStatus.Granted)
+                    await Permissions.RequestAsync<Permissions.Bluetooth>();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Bluetooth permission error: {ex.Message}");
             }
 #else
             await Task.CompletedTask;

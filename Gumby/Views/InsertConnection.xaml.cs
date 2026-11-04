@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Gumby.Views;
 
 namespace Gumby.Views
@@ -33,6 +33,7 @@ namespace Gumby.Views
 
         private async void OnBluetoothToggleClicked(object sender, EventArgs e)
         {
+            await Gumby.Tasks.BluetoothTaskService.EnsurePermissionAsync();
             var commandData = "10|2";  // Kod 10 = Bluetooth, 2 = Toggle
             var nfcPage = new NfcWriterPage(commandData, "Bluetooth: Toggle");
             await Navigation.PushAsync(nfcPage);
@@ -40,6 +41,7 @@ namespace Gumby.Views
 
         private async void OnBluetoothOnClicked(object sender, EventArgs e)
         {
+            await Gumby.Tasks.BluetoothTaskService.EnsurePermissionAsync();
             var commandData = "10|1";  // Kod 10 = Bluetooth, 1 = On
             var nfcPage = new NfcWriterPage(commandData, "Bluetooth: On");
             await Navigation.PushAsync(nfcPage);
@@ -47,6 +49,7 @@ namespace Gumby.Views
 
         private async void OnBluetoothOffClicked(object sender, EventArgs e)
         {
+            await Gumby.Tasks.BluetoothTaskService.EnsurePermissionAsync();
             var commandData = "10|0";  // Kod 10 = Bluetooth, 0 = Off
             var nfcPage = new NfcWriterPage(commandData, "Bluetooth: Off");
             await Navigation.PushAsync(nfcPage);

@@ -62,17 +62,13 @@ public partial class NfcWriterPage : ContentPage
             return;
         }
 
-        await MainThread.InvokeOnMainThreadAsync(async () =>
+        await MainThread.InvokeOnMainThreadAsync(() =>
         {
             if (success)
             {
                 _timeoutCts?.Cancel();
                 StatusLabel.Text = "✅ Chip written successfully!";
                 StatusLabel.TextColor = Colors.LightGreen;
-
-                await Task.Delay(1200);
-                if (Navigation.NavigationStack.LastOrDefault() == this)
-                    await Navigation.PopAsync();
             }
             else
             {
