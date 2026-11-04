@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using Debug = System.Diagnostics.Debug;
 using System.Threading.Tasks;
 using Microsoft.Maui.ApplicationModel;
 
