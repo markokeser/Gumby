@@ -1,3 +1,5 @@
+using Gumby.Controls;
+
 namespace Gumby.Views;
 
 public partial class InsertSetAlarm : ContentPage
@@ -33,10 +35,8 @@ public partial class InsertSetAlarm : ContentPage
     {
         _isPM = false;
         _use24HourFormat = false;
-        AMBtn.BackgroundColor = Colors.LightGreen;
-        AMBtn.TextColor = Colors.Black;
-        PMBtn.BackgroundColor = Color.FromArgb("#2A4A6B");
-        PMBtn.TextColor = Colors.White;
+        SetChipSelected(AMBtn, true);
+        SetChipSelected(PMBtn, false);
         AmPmLabel.Text = "Using 12-hour format (AM)";
     }
 
@@ -44,11 +44,16 @@ public partial class InsertSetAlarm : ContentPage
     {
         _isPM = true;
         _use24HourFormat = false;
-        PMBtn.BackgroundColor = Colors.LightGreen;
-        PMBtn.TextColor = Colors.Black;
-        AMBtn.BackgroundColor = Color.FromArgb("#2A4A6B");
-        AMBtn.TextColor = Colors.White;
+        SetChipSelected(PMBtn, true);
+        SetChipSelected(AMBtn, false);
         AmPmLabel.Text = "Using 12-hour format (PM)";
+    }
+
+    private static void SetChipSelected(Button button, bool selected)
+    {
+        button.BackgroundColor = selected ? AppColors.Accent : AppColors.SurfaceRaised;
+        button.TextColor = selected ? AppColors.TextOnAccent : AppColors.TextPrimary;
+        button.BorderColor = selected ? AppColors.Accent : AppColors.Stroke;
     }
 
     private async void OnWriteClicked(object sender, EventArgs e)

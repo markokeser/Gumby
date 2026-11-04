@@ -113,6 +113,11 @@ public partial class AppPickerPage : ContentPage
         }
     }
 
+    private async void OnBackClicked(object sender, EventArgs e)
+    {
+        await Navigation.PopAsync();
+    }
+
     private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
     {
         if (string.IsNullOrWhiteSpace(e.NewTextValue))

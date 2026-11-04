@@ -32,7 +32,7 @@ public partial class InsertOpenApp : ContentPage
             _selectedPackageName = packageName;
 
             SelectedAppLabel.Text = $"Selected: {appName}";
-            SelectedAppLabel.TextColor = Colors.LightGreen;
+            SelectedAppLabel.TextColor = Gumby.Controls.AppColors.Success;
             WriteBtn.IsEnabled = true;
         };
 

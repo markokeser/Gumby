@@ -1,94 +1,45 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:c="clr-namespace:Gumby.Controls"
              x:Class="Gumby.Views.InsertYoutubePlaylist"
-             Title="YouTube Playlist"
-             BackgroundColor="#000000"
+             Title="YouTube playlist"
              Shell.NavBarIsVisible="False">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="24" Spacing="24">
+    <Grid RowDefinitions="*, Auto">
+        <ScrollView>
+            <VerticalStackLayout Style="{StaticResource PageContent}">
 
-            <!-- YOUTUBE LOGO (tvoj youtube.png) -->
-            <Image Source="youtube.png"
-                   HeightRequest="80"
-                   HorizontalOptions="Center"
-                   Margin="0,20,0,0"/>
+                <c:PageHeader LogoSource="youtube.png"
+                              Title="YouTube playlist"
+                              Subtitle="The playlist opens in YouTube when the chip is tapped."
+                              AccentColor="{StaticResource BrandYouTube}"
+                              BackClicked="OnCancelClicked" />
 
-            <!-- Naslov i podnaslov -->
-            <Label Text="Add to NFC"
-                   FontSize="28"
-                   FontAttributes="Bold"
-                   TextColor="#FFFFFF"
-                   HorizontalOptions="Center"
-                   Margin="0,10,0,0"/>
+                <Border Style="{StaticResource Card}" Margin="0,28,0,0">
+                    <VerticalStackLayout>
+                        <Label Text="PLAYLIST LINK OR ID" Style="{StaticResource FieldLabel}" />
+                        <Border Style="{StaticResource InputShell}">
+                            <Entry x:Name="PlaylistEntry"
+                                   Placeholder="https://www.youtube.com/playlist?list=…"
+                                   Keyboard="Url" />
+                        </Border>
+                        <Label Text="In YouTube: Share → Copy link. An ID like PLxZx123456789 also works."
+                               Style="{StaticResource Hint}"
+                               Margin="2,10,0,0" />
+                    </VerticalStackLayout>
+                </Border>
 
-            <Label Text="Write a playlist to your NFC chip"
-                   FontSize="15"
-                   TextColor="#B3B3B3"
-                   HorizontalOptions="Center"
-                   HorizontalTextAlignment="Center"/>
-
-            <!-- Input kartica -->
-            <Frame BackgroundColor="#121212"
-                   CornerRadius="12"
-                   Padding="16"
-                   HasShadow="False"
-                   Margin="0,10,0,0">
-
-                <VerticalStackLayout Spacing="12">
-                    <Label Text="Playlist link"
-                           FontSize="13"
-                           TextColor="#B3B3B3"/>
-
-                    <Entry x:Name="PlaylistEntry"
-                           Placeholder="https://www.youtube.com/playlist?list=..."
-                           PlaceholderColor="#5A5A5A"
-                           TextColor="#FFFFFF"
-                           BackgroundColor="#1A1A1A"
-                           FontSize="15"
-                           Margin="-8,0,-8,0"
-                           HeightRequest="48"/>
-
-                    <BoxView HeightRequest="1" 
-                             BackgroundColor="#2A2A2A" 
-                             Margin="-8,0,-8,0"/>
-
-                    <Label Text="Enter YouTube playlist URL or ID"
-                           FontSize="12"
-                           TextColor="#7A7A7A"/>
-
-                    <Label Text="e.g., PLxZx123456789"
-                           FontSize="12"
-                           TextColor="#7A7A7A"
-                           Margin="0,-8,0,0"/>
-                </VerticalStackLayout>
-            </Frame>
-
-            <!-- Akciono dugme (YouTube crvena) -->
-            <Button x:Name="WriteBtn"
-                    Text="WRITE TO NFC CHIP"
-                    BackgroundColor="#FF0000"
-                    TextColor="#FFFFFF"
-                    FontAttributes="Bold"
-                    CornerRadius="24"
-                    HeightRequest="52"
-                    FontSize="14"
-                    Margin="0,10,0,0"
-                    Clicked="OnWriteClicked"/>
-
-            <!-- Footer -->
-            <VerticalStackLayout Spacing="8" Margin="0,10,0,20">
-                <Label Text="When tapped, your phone will open"
-                       FontSize="12"
-                       TextColor="#7A7A7A"
-                       HorizontalOptions="Center"/>
-                <Label Text="this playlist in YouTube"
-                       FontSize="12"
-                       TextColor="#7A7A7A"
-                       HorizontalOptions="Center"/>
             </VerticalStackLayout>
+        </ScrollView>
 
-        </VerticalStackLayout>
-    </ScrollView>
+        <Border Grid.Row="1" Style="{StaticResource ActionBar}">
+            <Button x:Name="WriteBtn"
+                    Text="Write to NFC chip"
+                    Style="{StaticResource PrimaryButton}"
+                    Background="{StaticResource BrandYouTube}"
+                    TextColor="White"
+                    Clicked="OnWriteClicked" />
+        </Border>
+    </Grid>
 </ContentPage>

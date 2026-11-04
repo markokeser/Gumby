@@ -3,74 +3,110 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Gumby.Views.NfcWriterPage"
              Title="Write to NFC"
-             BackgroundColor="#152B42">
+             Shell.NavBarIsVisible="False">
 
-    <Grid>
-        <VerticalStackLayout Padding="30" 
-                             Spacing="20" 
-                             VerticalOptions="Center">
+    <Grid RowDefinitions="Auto, *, Auto" Padding="20,16,20,20">
 
-            <!-- NFC Icon -->
-            <Frame CornerRadius="100"
-                   BackgroundColor="#2A4A6B"
-                   Padding="40"
-                   HorizontalOptions="Center"
-                   HeightRequest="180"
-                   WidthRequest="180">
-                <Label Text="📱💫"
-                       FontSize="70"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center"/>
-            </Frame>
+        <!-- Zatvori -->
+        <Button Text="✕"
+                Style="{StaticResource IconButton}"
+                FontSize="16"
+                HorizontalOptions="Start"
+                SemanticProperties.Description="Close"
+                Clicked="OnCancelClicked" />
 
-            <!-- Title -->
+        <!-- Animacija + status -->
+        <VerticalStackLayout Grid.Row="1" VerticalOptions="Center" Spacing="0">
+
+            <Grid WidthRequest="250" HeightRequest="250" HorizontalOptions="Center">
+                <Ellipse x:Name="Ring1"
+                         Stroke="{StaticResource Accent}"
+                         StrokeThickness="2"
+                         Opacity="0" />
+                <Ellipse x:Name="Ring2"
+                         Stroke="{StaticResource AccentDeep}"
+                         StrokeThickness="2"
+                         Opacity="0" />
+                <Ellipse WidthRequest="170" HeightRequest="170"
+                         Fill="{StaticResource AccentSoft}"
+                         HorizontalOptions="Center"
+                         VerticalOptions="Center" />
+
+                <Border x:Name="CenterBadge"
+                        WidthRequest="120" HeightRequest="120"
+                        StrokeShape="RoundRectangle 60"
+                        Background="{StaticResource AccentGradient}"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center">
+                    <Label x:Name="CenterIcon"
+                           Text="📲"
+                           FontSize="48"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Border>
+            </Grid>
+
             <Label x:Name="TitleLabel"
-                   Text="Tap your NFC chip"
-                   FontSize="22"
-                   FontAttributes="Bold"
-                   TextColor="White"
-                   HorizontalOptions="Center"/>
-
-            <!-- Data to Write -->
-            <Label x:Name="DataLabel"
-                   Text=""
-                   FontSize="14"
-                   TextColor="#AAAAAA"
+                   Text="Ready to write"
+                   Style="{StaticResource TitleText}"
                    HorizontalOptions="Center"
+                   Margin="0,28,0,0" />
+
+            <Label x:Name="HintLabel"
+                   Text="Hold the back of your phone against the NFC chip and keep it still for a moment."
+                   Style="{StaticResource Body}"
                    HorizontalTextAlignment="Center"
-                   IsVisible="False"/>
-
-            <!-- Status Message -->
-            <Label x:Name="StatusLabel"
-                   Text="Waiting for NFC chip..."
-                   FontSize="14"
-                   TextColor="#FFD700"
                    HorizontalOptions="Center"
-                   HorizontalTextAlignment="Center"/>
+                   MaximumWidthRequest="320"
+                   Margin="0,8,0,0" />
 
-            <!-- Countdown Timer -->
+            <Border x:Name="StatusPill"
+                    Style="{StaticResource Pill}"
+                    BackgroundColor="{StaticResource AccentSoft}"
+                    HorizontalOptions="Center"
+                    Padding="14,7"
+                    Margin="0,20,0,0">
+                <Label x:Name="StatusLabel"
+                       Text="Waiting for NFC chip…"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="13"
+                       TextColor="{StaticResource Accent}" />
+            </Border>
+
             <Label x:Name="TimerLabel"
                    Text=""
-                   FontSize="12"
-                   TextColor="#888888"
-                   HorizontalOptions="Center"/>
+                   Style="{StaticResource Hint}"
+                   HorizontalOptions="Center"
+                   Margin="0,10,0,0" />
 
-            <!-- Loading Indicator -->
             <ActivityIndicator x:Name="LoadingIndicator"
-                             IsRunning="False"
-                             IsVisible="False"
-                             HorizontalOptions="Center"
-                             Color="White"/>
+                               IsRunning="False"
+                               IsVisible="False"
+                               HorizontalOptions="Center" />
+        </VerticalStackLayout>
 
-            <!-- Cancel Button -->
-            <Button Text="Cancel"
-                    Clicked="OnCancelClicked"
-                    BackgroundColor="#555555"
-                    TextColor="White"
-                    CornerRadius="10"
-                    Margin="0,30,0,0"/>
+        <!-- Šta se upisuje -->
+        <VerticalStackLayout Grid.Row="2" Spacing="12">
+            <Border Style="{StaticResource Card}" Padding="16">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="WILL BE WRITTEN" Style="{StaticResource Overline}" />
+                    <Label x:Name="ActionNameLabel"
+                           Style="{StaticResource Heading}"
+                           LineBreakMode="TailTruncation"
+                           Margin="0,4,0,0" />
+                    <Label x:Name="DataLabel"
+                           Text=""
+                           Style="{StaticResource Hint}"
+                           MaxLines="2"
+                           LineBreakMode="TailTruncation"
+                           IsVisible="False" />
+                </VerticalStackLayout>
+            </Border>
 
+            <Button x:Name="CloseBtn"
+                    Text="Cancel"
+                    Style="{StaticResource SecondaryButton}"
+                    Clicked="OnCancelClicked" />
         </VerticalStackLayout>
     </Grid>
-
 </ContentPage>

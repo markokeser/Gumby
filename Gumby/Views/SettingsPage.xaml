@@ -1,164 +1,133 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:c="clr-namespace:Gumby.Controls"
              x:Class="Gumby.Views.SettingsPage"
              Title="Settings"
-             BackgroundColor="#0A0E17"
              Shell.NavBarIsVisible="False">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="0">
+        <VerticalStackLayout Style="{StaticResource PageContent}">
 
-            <!-- Header -->
-            <VerticalStackLayout Spacing="8" Margin="0,30,0,30" HorizontalOptions="Center">
-                <Label Text="⚙️"
-                       FontSize="48"
-                       HorizontalOptions="Center"/>
-                <Label Text="SETTINGS"
-                       FontSize="22"
-                       FontAttributes="Bold"
-                       TextColor="White"
-                       HorizontalOptions="Center"/>
-                <Label Text="Customize your NFC experience"
-                       FontSize="13"
-                       TextColor="#A0A8B8"
-                       HorizontalOptions="Center"
-                       HorizontalTextAlignment="Center"/>
-            </VerticalStackLayout>
+            <c:PageHeader Icon="⚙️"
+                          Title="Settings"
+                          Subtitle="Make Gumby work the way you like."
+                          AccentColor="{StaticResource CatSettings}"
+                          BackClicked="OnBackClicked" />
 
-            <!-- ========== BROWSER SECTION ========== -->
-            <Label Text="━━━━━━━ BROWSER ━━━━━━━"
-                   FontSize="14"
-                   FontAttributes="Bold"
-                   TextColor="#4CAF50"
-                   HorizontalOptions="Center"
-                   Margin="0,10,0,15"/>
+            <!-- Pregledač -->
+            <Label Text="BROWSER" Style="{StaticResource SectionTitle}" />
 
-            <!-- Custom Browser Toggle -->
-            <Grid ColumnDefinitions="*, Auto" Margin="0,5,0,10">
-                <Label Text="Use custom browser" 
-                       FontSize="15"
-                       TextColor="White" 
-                       VerticalOptions="Center"/>
-                <Switch x:Name="BrowserSwitch" 
-                        Toggled="OnBrowserToggled"/>
-            </Grid>
+            <Border Style="{StaticResource Card}" Padding="16">
+                <VerticalStackLayout Spacing="0">
+                    <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="14">
+                        <Border WidthRequest="40" HeightRequest="40"
+                                StrokeShape="RoundRectangle 13"
+                                BackgroundColor="{StaticResource AccentSoft}">
+                            <Label Text="🌐" FontSize="18"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                            <Label Text="Custom browser" Style="{StaticResource Heading}" FontSize="16" />
+                            <Label Text="Open links in a browser you choose"
+                                   Style="{StaticResource Caption}" />
+                        </VerticalStackLayout>
+                        <Switch Grid.Column="2"
+                                x:Name="BrowserSwitch"
+                                VerticalOptions="Center"
+                                Toggled="OnBrowserToggled" />
+                    </Grid>
 
-            <!-- Browser Selection Row -->
-            <Frame x:Name="BrowserSelectionFrame"
-                   BackgroundColor="#1A2333"
-                   CornerRadius="12"
-                   Padding="12"
-                   Margin="0,5,0,15"
-                   IsVisible="False">
+                    <!-- Izbor pregledača (vidljiv kada je prekidač uključen) -->
+                    <Border x:Name="BrowserSelectionFrame"
+                            BackgroundColor="{StaticResource SurfaceRaised}"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="14,10,10,10"
+                            Margin="0,16,0,0"
+                            IsVisible="False">
+                        <Grid ColumnDefinitions="*, Auto" ColumnSpacing="12">
+                            <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                <Label x:Name="SelectedBrowserLabel"
+                                       Text="Default browser"
+                                       FontFamily="OpenSansSemibold"
+                                       FontSize="15" />
+                                <Label x:Name="SelectedBrowserPackageLabel"
+                                       Text=""
+                                       Style="{StaticResource Hint}"
+                                       LineBreakMode="TailTruncation" />
+                            </VerticalStackLayout>
+                            <Button Grid.Column="1"
+                                    x:Name="SelectBrowserBtn"
+                                    Text="Change"
+                                    Style="{StaticResource ChipButton}"
+                                    HeightRequest="40"
+                                    Padding="16,0"
+                                    Clicked="OnSelectBrowserClicked" />
+                        </Grid>
+                    </Border>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                    <Label x:Name="BrowserInfoLabel"
+                           Text="Links will open in your chosen browser"
+                           Style="{StaticResource Hint}"
+                           Margin="2,14,0,0" />
+                </VerticalStackLayout>
+            </Border>
 
-                    <Label Grid.Column="0" 
-                           Text="🌐" 
-                           FontSize="18"
-                           VerticalOptions="Center"
-                           Margin="0,0,12,0"/>
+            <!-- Uskoro -->
+            <Label Text="PREFERENCES" Style="{StaticResource SectionTitle}" />
 
-                    <VerticalStackLayout Grid.Column="1" Spacing="2">
-                        <Label x:Name="SelectedBrowserLabel"
-                               Text="Default browser"
-                               FontSize="14"
-                               FontAttributes="Bold"
-                               TextColor="White"/>
-                        <Label x:Name="SelectedBrowserPackageLabel"
-                               Text=""
-                               FontSize="11"
-                               TextColor="#888888"/>
+            <Border Style="{StaticResource Card}" Padding="16,6">
+                <VerticalStackLayout Spacing="0">
+                    <Grid ColumnDefinitions="*, Auto, Auto" ColumnSpacing="10" MinimumHeightRequest="56">
+                        <Label Text="Dark theme" VerticalOptions="Center" />
+                        <Border Grid.Column="1" Style="{StaticResource Pill}">
+                            <Label Text="SOON" Style="{StaticResource Overline}" FontSize="10" />
+                        </Border>
+                        <Switch Grid.Column="2" x:Name="ThemeSwitch" IsToggled="True" IsEnabled="False"
+                                VerticalOptions="Center" />
+                    </Grid>
+                    <BoxView Style="{StaticResource Divider}" />
+                    <Grid ColumnDefinitions="*, Auto, Auto" ColumnSpacing="10" MinimumHeightRequest="56">
+                        <Label Text="NFC sound" VerticalOptions="Center" />
+                        <Border Grid.Column="1" Style="{StaticResource Pill}">
+                            <Label Text="SOON" Style="{StaticResource Overline}" FontSize="10" />
+                        </Border>
+                        <Switch Grid.Column="2" x:Name="SoundSwitch" IsEnabled="False"
+                                VerticalOptions="Center" />
+                    </Grid>
+                    <BoxView Style="{StaticResource Divider}" />
+                    <Grid ColumnDefinitions="*, Auto, Auto" ColumnSpacing="10" MinimumHeightRequest="56">
+                        <Label Text="NFC vibration" VerticalOptions="Center" />
+                        <Border Grid.Column="1" Style="{StaticResource Pill}">
+                            <Label Text="SOON" Style="{StaticResource Overline}" FontSize="10" />
+                        </Border>
+                        <Switch Grid.Column="2" x:Name="VibrationSwitch" IsEnabled="False"
+                                VerticalOptions="Center" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- O aplikaciji -->
+            <Label Text="ABOUT" Style="{StaticResource SectionTitle}" />
+
+            <Border Style="{StaticResource Card}">
+                <Grid ColumnDefinitions="Auto, *" ColumnSpacing="14">
+                    <Border WidthRequest="44" HeightRequest="44"
+                            StrokeShape="RoundRectangle 14"
+                            Background="{StaticResource AccentGradient}">
+                        <Label Text="G"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="22"
+                               TextColor="{StaticResource TextOnAccent}"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                    </Border>
+                    <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                        <Label Text="Gumby NFC Commander" Style="{StaticResource Heading}" FontSize="16" />
+                        <Label Text="Version 1.0" Style="{StaticResource Caption}" />
                     </VerticalStackLayout>
-
-                    <Button Grid.Column="2"
-                            x:Name="SelectBrowserBtn"
-                            Text="Change"
-                            BackgroundColor="#2A3448"
-                            TextColor="#A0A8B8"
-                            CornerRadius="8"
-                            HeightRequest="35"
-                            WidthRequest="70"
-                            FontSize="13"
-                            Clicked="OnSelectBrowserClicked"/>
                 </Grid>
-            </Frame>
-
-            <!-- Info text -->
-            <Label x:Name="BrowserInfoLabel"
-                   Text="Links will open in your chosen browser"
-                   FontSize="12"
-                   TextColor="#666666"
-                   HorizontalOptions="Center"
-                   IsVisible="True"/>
-
-            <!-- ========== THEME SECTION (za kasnije) ========== -->
-            <Label Text="━━━━━━━ THEME ━━━━━━━"
-                   FontSize="14"
-                   FontAttributes="Bold"
-                   TextColor="#4CAF50"
-                   HorizontalOptions="Center"
-                   Margin="0,30,0,15"/>
-
-            <Grid ColumnDefinitions="*, Auto" Margin="0,5,0,15">
-                <Label Text="Dark theme" 
-                       FontSize="15"
-                       TextColor="White" 
-                       VerticalOptions="Center"/>
-                <Switch x:Name="ThemeSwitch" 
-                        IsEnabled="False"/>
-            </Grid>
-
-            <!-- ========== NOTIFICATIONS SECTION (za kasnije) ========== -->
-            <Label Text="━━━━━━━ NOTIFICATIONS ━━━━━━━"
-                   FontSize="14"
-                   FontAttributes="Bold"
-                   TextColor="#4CAF50"
-                   HorizontalOptions="Center"
-                   Margin="0,30,0,15"/>
-
-            <Grid ColumnDefinitions="*, Auto" Margin="0,5,0,5">
-                <Label Text="NFC sound" 
-                       FontSize="15"
-                       TextColor="White" 
-                       VerticalOptions="Center"/>
-                <Switch x:Name="SoundSwitch" 
-                        IsEnabled="False"/>
-            </Grid>
-
-            <Grid ColumnDefinitions="*, Auto" Margin="0,5,0,15">
-                <Label Text="NFC vibration" 
-                       FontSize="15"
-                       TextColor="White" 
-                       VerticalOptions="Center"/>
-                <Switch x:Name="VibrationSwitch" 
-                        IsEnabled="False"/>
-            </Grid>
-
-            <!-- Footer -->
-            <BoxView HeightRequest="1" BackgroundColor="#2A3448" Margin="0,20,0,10"/>
-            <Label Text="Gumby NFC Commander v1.0"
-                   FontSize="11"
-                   TextColor="#555555"
-                   HorizontalOptions="Center"
-                   Margin="0,0,0,20"/>
-
-            <!-- Back Button -->
-            <Button x:Name="BackBtn"
-                    Text="Back"
-                    BackgroundColor="#2A3448"
-                    TextColor="#A0A8B8"
-                    CornerRadius="16"
-                    HeightRequest="45"
-                    FontSize="14"
-                    Margin="0,10,0,10"
-                    Clicked="OnBackClicked"/>
+            </Border>
 
         </VerticalStackLayout>
     </ScrollView>

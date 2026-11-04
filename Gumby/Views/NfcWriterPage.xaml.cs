@@ -1,4 +1,4 @@
-using Plugin.NFC;
+using Gumby.Controls;
 using System.Diagnostics;
 
 namespace Gumby.Views;
@@ -7,7 +7,8 @@ public partial class NfcWriterPage : ContentPage
 {
     private string _dataToWrite;
     private string _displayName;
-    private CancellationTokenSource _timeoutCts;
+    private CancellationTokenSource? _timeoutCts;
+    private bool _pulsing;
     private int _timeoutSeconds = 10;
     private int _remainingSeconds;
 
@@ -18,8 +19,9 @@ public partial class NfcWriterPage : ContentPage
         _dataToWrite = dataToWrite;
         _displayName = displayName;
 
-        DataLabel.Text = $"{_displayName}\n{_dataToWrite}";
-        DataLabel.IsVisible = true;
+        ActionNameLabel.Text = _displayName;
+        DataLabel.Text = _dataToWrite;
+        DataLabel.IsVisible = !string.IsNullOrEmpty(_dataToWrite);
 
         // SET VARIABLES IN MAINACTIVITY
         SetWriteMode();
@@ -30,8 +32,7 @@ public partial class NfcWriterPage : ContentPage
     private void SetWriteMode()
     {
         ArmWriteMode();
-        StatusLabel.Text = "✅ Ready - Tap your NFC chip";
-        StatusLabel.TextColor = Colors.LightGreen;
+        SetStatus("Waiting for NFC chip…", AppColors.Accent);
     }
 
     private void ArmWriteMode()
@@ -67,14 +68,12 @@ public partial class NfcWriterPage : ContentPage
             if (success)
             {
                 _timeoutCts?.Cancel();
-                StatusLabel.Text = "✅ Chip written successfully!";
-                StatusLabel.TextColor = Colors.LightGreen;
+                ShowSuccess();
             }
             else
             {
                 // Upis nije uspeo - ostavi stranicu otvorenu i omogući novi pokušaj
-                StatusLabel.Text = "❌ Write failed - tap the chip again";
-                StatusLabel.TextColor = Colors.Red;
+                ShowFailure();
                 ArmWriteMode();
             }
         });
@@ -115,8 +114,7 @@ public partial class NfcWriterPage : ContentPage
             {
                 await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
-                    StatusLabel.Text = "⏰ Timeout - No chip detected";
-                    StatusLabel.TextColor = Colors.Red;
+                    SetStatus("Timed out — no chip detected", AppColors.Danger);
                     await Task.Delay(1000);
 
                     ClearWriteMode();
@@ -136,9 +134,80 @@ public partial class NfcWriterPage : ContentPage
         });
     }
 
+    // ===================== IZGLED =====================
+
+    private void SetStatus(string text, Color color)
+    {
+        StatusLabel.Text = text;
+        StatusLabel.TextColor = color;
+        StatusPill.BackgroundColor = color.WithAlpha(0.14f);
+    }
+
+    private async void ShowSuccess()
+    {
+        _pulsing = false;
+        TitleLabel.Text = "All done!";
+        HintLabel.Text = "Your chip is ready. Tap it any time to run the action.";
+        SetStatus("Chip written successfully", AppColors.Success);
+
+        CenterIcon.Text = "✓";
+        CenterIcon.FontSize = 56;
+        CenterIcon.FontFamily = "OpenSansSemibold";
+        CenterIcon.TextColor = AppColors.TextOnAccent;
+        CenterBadge.Background = new SolidColorBrush(AppColors.Success);
+        CloseBtn.Text = "Done";
+
+        await CenterBadge.ScaleToAsync(1.08, 120, Easing.CubicOut);
+        await CenterBadge.ScaleToAsync(1, 160, Easing.CubicIn);
+    }
+
+    private async void ShowFailure()
+    {
+        SetStatus("Couldn't write — hold the chip again", AppColors.Danger);
+
+        // Kratko "odmahivanje" kao povratna informacija
+        for (int i = 0; i < 2; i++)
+        {
+            await CenterBadge.TranslateToAsync(-10, 0, 50);
+            await CenterBadge.TranslateToAsync(10, 0, 50);
+        }
+        await CenterBadge.TranslateToAsync(0, 0, 50);
+    }
+
+    private async void StartPulse()
+    {
+        if (_pulsing)
+            return;
+
+        _pulsing = true;
+        while (_pulsing)
+        {
+            var first = PulseRing(Ring1);
+            await Task.Delay(700);
+            var second = PulseRing(Ring2);
+            await Task.WhenAll(first, second);
+        }
+    }
+
+    private static async Task PulseRing(VisualElement ring)
+    {
+        ring.Scale = 0.6;
+        ring.Opacity = 0.8;
+        await Task.WhenAll(
+            ring.ScaleToAsync(1.0, 1400, Easing.CubicOut),
+            ring.FadeToAsync(0, 1400, Easing.CubicIn));
+    }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        StartPulse();
+    }
+
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
+        _pulsing = false;
         _timeoutCts?.Cancel();
         ClearWriteMode();
     }

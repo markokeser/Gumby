@@ -1,206 +1,177 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:c="clr-namespace:Gumby.Controls"
              x:Class="Gumby.Views.InsertSetAlarm"
-             Title="Set Alarm"
-             BackgroundColor="#0A0E17"
+             Title="Alarm"
              Shell.NavBarIsVisible="False">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="0">
+    <Grid RowDefinitions="*, Auto">
+        <ScrollView>
+            <VerticalStackLayout Style="{StaticResource PageContent}">
 
-            <!-- Header -->
-            <VerticalStackLayout Spacing="8" Margin="0,30,0,30" HorizontalOptions="Center">
-                <Label Text="⏰"
-                       FontSize="48"
-                       HorizontalOptions="Center"/>
-                <Label Text="SET ALARM"
-                       FontSize="22"
-                       FontAttributes="Bold"
-                       TextColor="White"
-                       HorizontalOptions="Center"/>
-                <Label Text="Set an alarm that will trigger when NFC chip is tapped"
-                       FontSize="13"
-                       TextColor="#A0A8B8"
-                       HorizontalOptions="Center"
-                       HorizontalTextAlignment="Center"/>
+                <c:PageHeader Icon="⏰"
+                              Title="Alarm"
+                              Subtitle="An alarm is set in your clock app when the chip is tapped."
+                              AccentColor="{StaticResource CatClock}"
+                              BackClicked="OnCancelClicked" />
+
+                <Border Style="{StaticResource Card}" Margin="0,28,0,0">
+                    <VerticalStackLayout>
+                        <Label Text="ALARM TIME" Style="{StaticResource FieldLabel}" />
+
+                        <Grid ColumnDefinitions="*, Auto, *" ColumnSpacing="10">
+                            <Border Style="{StaticResource InputShell}">
+                            <Picker x:Name="HourPicker"
+                                    Title="Hour"
+                                    FontSize="34"
+                                    FontFamily="OpenSansSemibold"
+                                    HorizontalTextAlignment="Center"
+                                    MinimumHeightRequest="72">
+                                <Picker.Items>
+                                        <x:String>00</x:String>
+                                        <x:String>01</x:String>
+                                        <x:String>02</x:String>
+                                        <x:String>03</x:String>
+                                        <x:String>04</x:String>
+                                        <x:String>05</x:String>
+                                        <x:String>06</x:String>
+                                        <x:String>07</x:String>
+                                        <x:String>08</x:String>
+                                        <x:String>09</x:String>
+                                        <x:String>10</x:String>
+                                        <x:String>11</x:String>
+                                        <x:String>12</x:String>
+                                        <x:String>13</x:String>
+                                        <x:String>14</x:String>
+                                        <x:String>15</x:String>
+                                        <x:String>16</x:String>
+                                        <x:String>17</x:String>
+                                        <x:String>18</x:String>
+                                        <x:String>19</x:String>
+                                        <x:String>20</x:String>
+                                        <x:String>21</x:String>
+                                        <x:String>22</x:String>
+                                        <x:String>23</x:String>
+                                </Picker.Items>
+                            </Picker>
+                            </Border>
+
+                            <Label Grid.Column="1"
+                                   Text=":"
+                                   FontSize="34"
+                                   FontFamily="OpenSansSemibold"
+                                   TextColor="{StaticResource TextMuted}"
+                                   VerticalOptions="Center" />
+
+                            <Border Grid.Column="2" Style="{StaticResource InputShell}">
+                            <Picker x:Name="MinutePicker"
+                                    Title="Min"
+                                    FontSize="34"
+                                    FontFamily="OpenSansSemibold"
+                                    HorizontalTextAlignment="Center"
+                                    MinimumHeightRequest="72">
+                                <Picker.Items>
+                                        <x:String>00</x:String>
+                                        <x:String>01</x:String>
+                                        <x:String>02</x:String>
+                                        <x:String>03</x:String>
+                                        <x:String>04</x:String>
+                                        <x:String>05</x:String>
+                                        <x:String>06</x:String>
+                                        <x:String>07</x:String>
+                                        <x:String>08</x:String>
+                                        <x:String>09</x:String>
+                                        <x:String>10</x:String>
+                                        <x:String>11</x:String>
+                                        <x:String>12</x:String>
+                                        <x:String>13</x:String>
+                                        <x:String>14</x:String>
+                                        <x:String>15</x:String>
+                                        <x:String>16</x:String>
+                                        <x:String>17</x:String>
+                                        <x:String>18</x:String>
+                                        <x:String>19</x:String>
+                                        <x:String>20</x:String>
+                                        <x:String>21</x:String>
+                                        <x:String>22</x:String>
+                                        <x:String>23</x:String>
+                                        <x:String>24</x:String>
+                                        <x:String>25</x:String>
+                                        <x:String>26</x:String>
+                                        <x:String>27</x:String>
+                                        <x:String>28</x:String>
+                                        <x:String>29</x:String>
+                                        <x:String>30</x:String>
+                                        <x:String>31</x:String>
+                                        <x:String>32</x:String>
+                                        <x:String>33</x:String>
+                                        <x:String>34</x:String>
+                                        <x:String>35</x:String>
+                                        <x:String>36</x:String>
+                                        <x:String>37</x:String>
+                                        <x:String>38</x:String>
+                                        <x:String>39</x:String>
+                                        <x:String>40</x:String>
+                                        <x:String>41</x:String>
+                                        <x:String>42</x:String>
+                                        <x:String>43</x:String>
+                                        <x:String>44</x:String>
+                                        <x:String>45</x:String>
+                                        <x:String>46</x:String>
+                                        <x:String>47</x:String>
+                                        <x:String>48</x:String>
+                                        <x:String>49</x:String>
+                                        <x:String>50</x:String>
+                                        <x:String>51</x:String>
+                                        <x:String>52</x:String>
+                                        <x:String>53</x:String>
+                                        <x:String>54</x:String>
+                                        <x:String>55</x:String>
+                                        <x:String>56</x:String>
+                                        <x:String>57</x:String>
+                                        <x:String>58</x:String>
+                                        <x:String>59</x:String>
+                                </Picker.Items>
+                            </Picker>
+                            </Border>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*, *" Margin="0,8,0,0">
+                            <Label Text="hours" Style="{StaticResource Hint}" HorizontalOptions="Center" />
+                            <Label Grid.Column="1" Text="minutes" Style="{StaticResource Hint}" HorizontalOptions="Center" />
+                        </Grid>
+
+                        <BoxView Style="{StaticResource Divider}" Margin="0,20" />
+
+                        <Label Text="12-HOUR FORMAT · OPTIONAL" Style="{StaticResource FieldLabel}" />
+                        <Grid ColumnDefinitions="*, *" ColumnSpacing="10">
+                            <Button x:Name="AMBtn"
+                                    Text="AM"
+                                    Style="{StaticResource ChipButton}"
+                                    Clicked="OnAMClicked" />
+                            <Button x:Name="PMBtn"
+                                    Grid.Column="1"
+                                    Text="PM"
+                                    Style="{StaticResource ChipButton}"
+                                    Clicked="OnPMClicked" />
+                        </Grid>
+
+                        <Label x:Name="AmPmLabel"
+                               Text="Using 24-hour format"
+                               Style="{StaticResource Hint}"
+                               Margin="2,10,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+
             </VerticalStackLayout>
+        </ScrollView>
 
-            <!-- Hour Picker -->
-            <Label Text="Hour"
-                   FontSize="14"
-                   FontAttributes="Bold"
-                   TextColor="White"
-                   Margin="0,10,0,5"/>
-
-            <Picker x:Name="HourPicker"
-                    Title="Select hour"
-                    BackgroundColor="#1A2333"
-                    TextColor="White"
-                    TitleColor="#888888"
-                    Margin="0,0,0,15">
-                <Picker.Items>
-                    <x:String>00</x:String>
-                    <x:String>01</x:String>
-                    <x:String>02</x:String>
-                    <x:String>03</x:String>
-                    <x:String>04</x:String>
-                    <x:String>05</x:String>
-                    <x:String>06</x:String>
-                    <x:String>07</x:String>
-                    <x:String>08</x:String>
-                    <x:String>09</x:String>
-                    <x:String>10</x:String>
-                    <x:String>11</x:String>
-                    <x:String>12</x:String>
-                    <x:String>13</x:String>
-                    <x:String>14</x:String>
-                    <x:String>15</x:String>
-                    <x:String>16</x:String>
-                    <x:String>17</x:String>
-                    <x:String>18</x:String>
-                    <x:String>19</x:String>
-                    <x:String>20</x:String>
-                    <x:String>21</x:String>
-                    <x:String>22</x:String>
-                    <x:String>23</x:String>
-                </Picker.Items>
-            </Picker>
-
-            <!-- Minute Picker -->
-            <Label Text="Minute"
-                   FontSize="14"
-                   FontAttributes="Bold"
-                   TextColor="White"
-                   Margin="0,10,0,5"/>
-
-            <Picker x:Name="MinutePicker"
-                    Title="Select minute"
-                    BackgroundColor="#1A2333"
-                    TextColor="White"
-                    TitleColor="#888888"
-                    Margin="0,0,0,15">
-                <Picker.Items>
-                    <x:String>00</x:String>
-                    <x:String>01</x:String>
-                    <x:String>02</x:String>
-                    <x:String>03</x:String>
-                    <x:String>04</x:String>
-                    <x:String>05</x:String>
-                    <x:String>06</x:String>
-                    <x:String>07</x:String>
-                    <x:String>08</x:String>
-                    <x:String>09</x:String>
-                    <x:String>10</x:String>
-                    <x:String>11</x:String>
-                    <x:String>12</x:String>
-                    <x:String>13</x:String>
-                    <x:String>14</x:String>
-                    <x:String>15</x:String>
-                    <x:String>16</x:String>
-                    <x:String>17</x:String>
-                    <x:String>18</x:String>
-                    <x:String>19</x:String>
-                    <x:String>20</x:String>
-                    <x:String>21</x:String>
-                    <x:String>22</x:String>
-                    <x:String>23</x:String>
-                    <x:String>24</x:String>
-                    <x:String>25</x:String>
-                    <x:String>26</x:String>
-                    <x:String>27</x:String>
-                    <x:String>28</x:String>
-                    <x:String>29</x:String>
-                    <x:String>30</x:String>
-                    <x:String>31</x:String>
-                    <x:String>32</x:String>
-                    <x:String>33</x:String>
-                    <x:String>34</x:String>
-                    <x:String>35</x:String>
-                    <x:String>36</x:String>
-                    <x:String>37</x:String>
-                    <x:String>38</x:String>
-                    <x:String>39</x:String>
-                    <x:String>40</x:String>
-                    <x:String>41</x:String>
-                    <x:String>42</x:String>
-                    <x:String>43</x:String>
-                    <x:String>44</x:String>
-                    <x:String>45</x:String>
-                    <x:String>46</x:String>
-                    <x:String>47</x:String>
-                    <x:String>48</x:String>
-                    <x:String>49</x:String>
-                    <x:String>50</x:String>
-                    <x:String>51</x:String>
-                    <x:String>52</x:String>
-                    <x:String>53</x:String>
-                    <x:String>54</x:String>
-                    <x:String>55</x:String>
-                    <x:String>56</x:String>
-                    <x:String>57</x:String>
-                    <x:String>58</x:String>
-                    <x:String>59</x:String>
-                </Picker.Items>
-            </Picker>
-
-            <!-- AM/PM Toggle -->
-            <Label Text="Time Format"
-                   FontSize="14"
-                   FontAttributes="Bold"
-                   TextColor="White"
-                   Margin="0,10,0,5"/>
-
-            <Grid ColumnDefinitions="*, *" ColumnSpacing="12" Margin="0,0,0,10">
-                <Button x:Name="AMBtn"
-                        Grid.Column="0"
-                        Text="AM"
-                        BackgroundColor="#1A2333"
-                        TextColor="White"
-                        CornerRadius="16"
-                        HeightRequest="45"
-                        Clicked="OnAMClicked"/>
-                <Button x:Name="PMBtn"
-                        Grid.Column="1"
-                        Text="PM"
-                        BackgroundColor="#1A2333"
-                        TextColor="White"
-                        CornerRadius="16"
-                        HeightRequest="45"
-                        Clicked="OnPMClicked"/>
-            </Grid>
-
-            <!-- Message Label -->
-            <Label x:Name="AmPmLabel"
-                   Text="Using 24-hour format"
-                   FontSize="12"
-                   TextColor="#666666"
-                   HorizontalOptions="Center"
-                   Margin="0,5,0,15"/>
-
-            <!-- Write Button -->
+        <Border Grid.Row="1" Style="{StaticResource ActionBar}">
             <Button x:Name="WriteBtn"
-                    Text="💾 Write to NFC Chip"
-                    BackgroundColor="#4CAF50"
-                    TextColor="White"
-                    CornerRadius="16"
-                    HeightRequest="55"
-                    FontSize="16"
-                    FontAttributes="Bold"
-                    Margin="0,10,0,10"
-                    Clicked="OnWriteClicked"/>
-
-            <!-- Cancel Button -->
-            <Button x:Name="CancelBtn"
-                    Text="Cancel"
-                    BackgroundColor="#2A3448"
-                    TextColor="#A0A8B8"
-                    CornerRadius="16"
-                    HeightRequest="45"
-                    FontSize="14"
-                    Clicked="OnCancelClicked"/>
-
-        </VerticalStackLayout>
-    </ScrollView>
-
+                    Text="Write to NFC chip"
+                    Style="{StaticResource PrimaryButton}"
+                    Clicked="OnWriteClicked" />
+        </Border>
+    </Grid>
 </ContentPage>

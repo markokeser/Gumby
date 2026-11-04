@@ -1,84 +1,76 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:c="clr-namespace:Gumby.Controls"
+             xmlns:views="clr-namespace:Gumby.Views"
              x:Class="Gumby.Views.ContactPickerPage"
-             Title="Select Contact"
-             BackgroundColor="#0A0E17"
+             Title="Choose a contact"
              Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto, *">
+    <Grid RowDefinitions="Auto, Auto, *">
 
-        <!-- Search Bar -->
-        <VerticalStackLayout Grid.Row="0" Padding="20" Spacing="10">
-            <Label Text="👤 SELECT CONTACT"
-                   FontSize="22"
-                   FontAttributes="Bold"
-                   TextColor="White"
-                   HorizontalOptions="Center"
-                   Margin="0,20,0,10"/>
+        <c:PageHeader Grid.Row="0"
+                      Margin="20,8,20,0"
+                      Icon="👤"
+                      Title="Choose a contact"
+                      AccentColor="{StaticResource CatPhone}"
+                      BackClicked="OnBackClicked" />
 
+        <Border Grid.Row="1"
+                Style="{StaticResource InputShell}"
+                Padding="4,0"
+                Margin="20,20,20,12">
             <SearchBar x:Name="SearchBar"
-                       Placeholder="Search contacts..."
-                       BackgroundColor="#1A2333"
-                       TextColor="White"
-                       CancelButtonColor="#A0A8B8"/>
-        </VerticalStackLayout>
+                       Placeholder="Search contacts" />
+        </Border>
 
-        <!-- Contacts List -->
         <CollectionView x:Name="ContactsView"
-                        Grid.Row="1"
+                        Grid.Row="2"
                         SelectionMode="Single"
-                        Margin="10,0,10,10">
+                        Margin="20,0,20,0">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
+            </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Grid ColumnDefinitions="Auto, *"
-                          Padding="15,10"
-                          RowSpacing="0">
-                        <Frame Grid.Column="0"
-                               BackgroundColor="#1A2333"
-                               CornerRadius="25"
-                               HeightRequest="50"
-                               WidthRequest="50"
-                               Padding="0"
-                               Margin="0,0,15,0">
-                            <Label Text="👤"
-                                   FontSize="24"
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center"/>
-                        </Frame>
-                        <VerticalStackLayout Grid.Column="1"
-                                             VerticalOptions="Center">
-                            <Label Text="{Binding Name}"
-                                   FontSize="16"
-                                   FontAttributes="Bold"
-                                   TextColor="White"/>
-                            <Label Text="{Binding Number}"
-                                   FontSize="13"
-                                   TextColor="#A0A8B8"/>
-                        </VerticalStackLayout>
-                    </Grid>
+                <DataTemplate x:DataType="views:ContactInfo">
+                    <Border Style="{StaticResource Card}" Padding="12">
+                        <Grid ColumnDefinitions="Auto, *" ColumnSpacing="14">
+                            <Border WidthRequest="42" HeightRequest="42"
+                                    StrokeShape="RoundRectangle 21"
+                                    BackgroundColor="{StaticResource AccentSoft}">
+                                <Label Text="👤" FontSize="18"
+                                       HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                <Label Text="{Binding Name}"
+                                       FontFamily="OpenSansSemibold"
+                                       FontSize="15"
+                                       LineBreakMode="TailTruncation" />
+                                <Label Text="{Binding Number}"
+                                       Style="{StaticResource Caption}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <!-- Loading Indicator -->
         <ActivityIndicator x:Name="LoadingIndicator"
-                           Grid.Row="1"
+                           Grid.Row="2"
                            IsRunning="True"
                            IsVisible="True"
-                           Color="White"
                            VerticalOptions="Center"
-                           HorizontalOptions="Center"/>
+                           HorizontalOptions="Center" />
 
-        <!-- No Contacts Label -->
-        <Label x:Name="NoContactsLabel"
-               Grid.Row="1"
-               Text="No contacts found"
-               FontSize="16"
-               TextColor="#A0A8B8"
-               HorizontalOptions="Center"
-               VerticalOptions="Center"
-               IsVisible="False"/>
-
+        <VerticalStackLayout x:Name="NoContactsLabel"
+                             Grid.Row="2"
+                             Spacing="6"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             IsVisible="False">
+            <Label Text="🔍" FontSize="32" HorizontalOptions="Center" />
+            <Label Text="No contacts found" Style="{StaticResource Heading}" HorizontalOptions="Center" />
+            <Label Text="Try a different name or number." Style="{StaticResource Caption}" HorizontalOptions="Center" />
+        </VerticalStackLayout>
     </Grid>
 </ContentPage>
