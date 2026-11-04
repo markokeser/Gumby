@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Prozirna tema -->
+    <style name="TransparentTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+    
+    <!-- Alternativa: potpuno bez prozora -->
+    <style name="NoDisplayTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowNoDisplay">true</item>
+        <item name="android:windowBackground">@null</item>
+    </style>
+</resources>

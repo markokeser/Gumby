@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Gumby.Views.InsertLink"
+             Title="Insert Link"
+             BackgroundColor="#0A0E17"
+             Shell.NavBarIsVisible="False">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="0">
+
+            <!-- Header -->
+            <VerticalStackLayout Spacing="8" Margin="0,30,0,30" HorizontalOptions="Center">
+                <Label Text="🔗"
+                       FontSize="48"
+                       HorizontalOptions="Center"/>
+                <Label Text="WRITE LINK"
+                       FontSize="22"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       HorizontalOptions="Center"/>
+                <Label Text="Enter a URL or web link to write to NFC chip"
+                       FontSize="13"
+                       TextColor="#A0A8B8"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
+
+            <!-- Link Input -->
+            <Label Text="Link"
+                   FontSize="14"
+                   FontAttributes="Bold"
+                   TextColor="White"
+                   Margin="0,10,0,5"/>
+
+            <Entry x:Name="LinkEntry"
+                   Placeholder="https://example.com"
+                   PlaceholderColor="#666666"
+                   TextColor="White"
+                   BackgroundColor="#1A2333"
+                   HeightRequest="50"
+                   Margin="0,0,0,20"/>
+
+            <!-- Write Button -->
+            <Button x:Name="WriteBtn"
+                    Text="💾 Write to NFC Chip"
+                    BackgroundColor="#4CAF50"
+                    TextColor="White"
+                    CornerRadius="16"
+                    HeightRequest="55"
+                    FontSize="16"
+                    FontAttributes="Bold"
+                    Margin="0,20,0,10"
+                    Clicked="OnWriteClicked"/>
+
+            <!-- Cancel Button -->
+            <Button x:Name="CancelBtn"
+                    Text="Cancel"
+                    BackgroundColor="#2A3448"
+                    TextColor="#A0A8B8"
+                    CornerRadius="16"
+                    HeightRequest="45"
+                    FontSize="14"
+                    Clicked="OnCancelClicked"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

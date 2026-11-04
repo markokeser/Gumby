@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Gumby.Views.MultiCommandBuilder"
+             Title="Multi Command Builder"
+             BackgroundColor="#0A0E17"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto, Auto, *, Auto">
+
+        <!-- Header -->
+        <VerticalStackLayout Grid.Row="0" Padding="20" Spacing="0" Margin="0,20,0,10">
+            <Label Text="🧩"
+                   FontSize="48"
+                   HorizontalOptions="Center"/>
+            <Label Text="MULTI COMMAND BUILDER" 
+                   FontSize="24" 
+                   FontAttributes="Bold" 
+                   TextColor="White" 
+                   HorizontalOptions="Center"
+                   Margin="0,5,0,5"/>
+            <Label Text="Combine multiple actions into one NFC chip"
+                   FontSize="13" 
+                   TextColor="#A0A8B8" 
+                   HorizontalOptions="Center" 
+                   HorizontalTextAlignment="Center"/>
+        </VerticalStackLayout>
+
+        <!-- Add Task Button -->
+        <Button Grid.Row="1"
+                x:Name="AddTaskBtn"
+                Text="+ Add New Task"
+                BackgroundColor="#2196F3"
+                TextColor="White"
+                CornerRadius="12"
+                HeightRequest="50"
+                FontSize="15"
+                FontAttributes="Bold"
+                Margin="20,5,20,10"
+                Clicked="OnAddTaskClicked"/>
+
+        <!-- Task Sequence Section -->
+        <Grid Grid.Row="2" Margin="20,0,40,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0"
+                   Text="TASK SEQUENCE"
+                   FontSize="14"
+                   FontAttributes="Bold"
+                   TextColor="#A0A8B8"
+                   Margin="0,0,0,10"/>
+
+            <!-- Lista zadataka -->
+            <CollectionView x:Name="CommandsView" 
+                            Grid.Row="1"
+                            HeightRequest="300">
+                <CollectionView.EmptyView>
+                    <Label Text="No tasks added yet. Tap + Add New Task to start."
+                           FontSize="14"
+                           TextColor="#666666"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="*, Auto" 
+                              ColumnSpacing="10"
+                              Margin="0,5">
+                            <Frame Grid.Column="0"
+                                   BackgroundColor="#1A2333"
+                                   CornerRadius="12"
+                                   Padding="15,12"
+                                   HasShadow="False">
+                                <Label Text="{Binding DisplayText}"
+                                       FontSize="14"
+                                       TextColor="White"
+                                       LineBreakMode="TailTruncation"/>
+                            </Frame>
+                            <Button Grid.Column="1"
+        Text="✖"
+        BackgroundColor="#FF5252"
+        TextColor="White"
+        WidthRequest="44"
+        HeightRequest="44"
+        CornerRadius="12"
+        FontSize="16"
+        FontAttributes="Bold"
+        Clicked="OnRemoveCommand"
+        CommandParameter="{Binding .}"/>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+        <!-- Action Buttons -->
+        <VerticalStackLayout Grid.Row="3" Padding="20" Spacing="10">
+            <Button x:Name="WriteBtn"
+                    Text="💾 Write to NFC Chip"
+                    BackgroundColor="#4CAF50"
+                    TextColor="White"
+                    CornerRadius="12"
+                    HeightRequest="55"
+                    FontSize="16"
+                    FontAttributes="Bold"
+                    Clicked="OnWriteClicked"/>
+
+            <Button x:Name="ClearBtn"
+                    Text="🗑️ Clear All"
+                    BackgroundColor="#FF5252"
+                    TextColor="White"
+                    CornerRadius="12"
+                    HeightRequest="45"
+                    FontSize="14"
+                    Clicked="OnClearClicked"/>
+
+            <Button x:Name="CancelBtn"
+                    Text="Cancel"
+                    BackgroundColor="#2A3448"
+                    TextColor="#A0A8B8"
+                    CornerRadius="12"
+                    HeightRequest="45"
+                    FontSize="14"
+                    Clicked="OnCancelClicked"/>
+        </VerticalStackLayout>
+
+    </Grid>
+</ContentPage>

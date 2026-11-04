@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Gumby.Views.InsertOpenApp"
+             Title="Open App"
+             BackgroundColor="#0A0E17"
+             Shell.NavBarIsVisible="False">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="0">
+
+            <!-- Header -->
+            <VerticalStackLayout Spacing="8" Margin="0,30,0,30" HorizontalOptions="Center">
+                <Label Text="📱"
+                       FontSize="48"
+                       HorizontalOptions="Center"/>
+                <Label Text="OPEN APP"
+                       FontSize="22"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       HorizontalOptions="Center"/>
+                <Label Text="Select an app to open when NFC chip is tapped"
+                       FontSize="13"
+                       TextColor="#A0A8B8"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
+
+            <!-- Select App Button -->
+            <Button x:Name="SelectAppBtn"
+                    Text="📋 Select App from List"
+                    BackgroundColor="#2196F3"
+                    TextColor="White"
+                    CornerRadius="16"
+                    HeightRequest="50"
+                    FontSize="15"
+                    FontAttributes="Bold"
+                    Clicked="OnSelectAppClicked"/>
+
+            <!-- Selected App Display -->
+            <Frame BackgroundColor="#1A2333"
+                   CornerRadius="12"
+                   Padding="15"
+                   Margin="0,15,0,0"
+                   HasShadow="False">
+                <Label x:Name="SelectedAppLabel"
+                       Text="No app selected"
+                       FontSize="14"
+                       TextColor="#A0A8B8"
+                       HorizontalOptions="Center"/>
+            </Frame>
+
+            <!-- Write Button -->
+            <Button x:Name="WriteBtn"
+                    Text="💾 Write to NFC Chip"
+                    BackgroundColor="#4CAF50"
+                    TextColor="White"
+                    CornerRadius="16"
+                    HeightRequest="55"
+                    FontSize="16"
+                    FontAttributes="Bold"
+                    Margin="0,30,0,10"
+                    Clicked="OnWriteClicked"
+                    IsEnabled="False"/>
+
+            <!-- Cancel Button -->
+            <Button x:Name="CancelBtn"
+                    Text="Cancel"
+                    BackgroundColor="#2A3448"
+                    TextColor="#A0A8B8"
+                    CornerRadius="16"
+                    HeightRequest="45"
+                    FontSize="14"
+                    Clicked="OnCancelClicked"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

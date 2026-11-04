@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Gumby.Views.AppPickerPage"
+             Title="Select App"
+             BackgroundColor="#152B42">
+
+    <Grid RowDefinitions="Auto, *">
+
+        <!-- Header -->
+        <VerticalStackLayout Grid.Row="0" Padding="20" Spacing="10">
+            <SearchBar x:Name="SearchBar"
+                       Placeholder="Search apps..."
+                       BackgroundColor="#2A4A6B"
+                       TextColor="White"
+                       CancelButtonColor="White"/>
+        </VerticalStackLayout>
+
+        <!-- Apps List -->
+        <CollectionView x:Name="AppsCollectionView"
+                        Grid.Row="1"
+                        SelectionMode="Single"
+                        Margin="10,0,10,10">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid ColumnDefinitions="Auto, *"
+                          Padding="10,8"
+                          ColumnSpacing="12">
+
+                        <!-- App Icon -->
+                        <Label Grid.Column="0"
+                               Text="📱"
+                               FontSize="25"
+                               VerticalOptions="Center"/>
+
+                        <!-- App Name and Package -->
+                        <VerticalStackLayout Grid.Column="1"
+                                             VerticalOptions="Center">
+                            <Label Text="{Binding AppName}"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   TextColor="White"/>
+                            <Label Text="{Binding PackageName}"
+                                   FontSize="11"
+                                   TextColor="#888888"
+                                   LineBreakMode="TailTruncation"/>
+                        </VerticalStackLayout>
+
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Loading Indicator -->
+        <ActivityIndicator x:Name="LoadingIndicator"
+                           Grid.Row="1"
+                           IsRunning="True"
+                           IsVisible="True"
+                           Color="White"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Center"/>
+
+    </Grid>
+</ContentPage>

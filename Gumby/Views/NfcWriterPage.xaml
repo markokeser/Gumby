@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Gumby.Views.NfcWriterPage"
+             Title="Write to NFC"
+             BackgroundColor="#152B42">
+
+    <Grid>
+        <VerticalStackLayout Padding="30" 
+                             Spacing="20" 
+                             VerticalOptions="Center">
+
+            <!-- NFC Icon -->
+            <Frame CornerRadius="100"
+                   BackgroundColor="#2A4A6B"
+                   Padding="40"
+                   HorizontalOptions="Center"
+                   HeightRequest="180"
+                   WidthRequest="180">
+                <Label Text="📱💫"
+                       FontSize="70"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+            </Frame>
+
+            <!-- Title -->
+            <Label x:Name="TitleLabel"
+                   Text="Tap your NFC chip"
+                   FontSize="22"
+                   FontAttributes="Bold"
+                   TextColor="White"
+                   HorizontalOptions="Center"/>
+
+            <!-- Data to Write -->
+            <Label x:Name="DataLabel"
+                   Text=""
+                   FontSize="14"
+                   TextColor="#AAAAAA"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"
+                   IsVisible="False"/>
+
+            <!-- Status Message -->
+            <Label x:Name="StatusLabel"
+                   Text="Waiting for NFC chip..."
+                   FontSize="14"
+                   TextColor="#FFD700"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"/>
+
+            <!-- Countdown Timer -->
+            <Label x:Name="TimerLabel"
+                   Text=""
+                   FontSize="12"
+                   TextColor="#888888"
+                   HorizontalOptions="Center"/>
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator x:Name="LoadingIndicator"
+                             IsRunning="False"
+                             IsVisible="False"
+                             HorizontalOptions="Center"
+                             Color="White"/>
+
+            <!-- Cancel Button -->
+            <Button Text="Cancel"
+                    Clicked="OnCancelClicked"
+                    BackgroundColor="#555555"
+                    TextColor="White"
+                    CornerRadius="10"
+                    Margin="0,30,0,0"/>
+
+        </VerticalStackLayout>
+    </Grid>
+
+</ContentPage>

@@ -1,0 +1,29 @@
+cat > .gitignore << 'EOF'
+# Build output
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio (local cache and personal settings)
+.vs/
+*.user
+*.suo
+*.rsuser
+
+# Rider / ReSharper
+.idea/
+*.DotSettings.user
+
+# Android packages and signing keys
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# Java crash logs
+hs_err_pid*.log
+replay_pid*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+EOF
