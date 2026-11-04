@@ -126,6 +126,11 @@ namespace Gumby.Views
             }
         }
 
+        private async void OnBackClicked(object sender, EventArgs e)
+        {
+            await Navigation.PopAsync();
+        }
+
         private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(e.NewTextValue))

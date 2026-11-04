@@ -1,68 +1,42 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:c="clr-namespace:Gumby.Controls"
              x:Class="Gumby.Views.InsertGoogleMaps"
-             Title="Google Maps"
-             BackgroundColor="#0A0E17"
+             Title="Maps"
              Shell.NavBarIsVisible="False">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="0">
+    <Grid RowDefinitions="*, Auto">
+        <ScrollView>
+            <VerticalStackLayout Style="{StaticResource PageContent}">
 
-            <!-- Header -->
-            <VerticalStackLayout Spacing="8" Margin="0,30,0,30" HorizontalOptions="Center">
-                <Label Text="🗺️"
-                       FontSize="48"
-                       HorizontalOptions="Center"/>
-                <Label Text="GOOGLE MAPS"
-                       FontSize="22"
-                       FontAttributes="Bold"
-                       TextColor="White"
-                       HorizontalOptions="Center"/>
-                <Label Text="Write a location to your NFC chip"
-                       FontSize="13"
-                       TextColor="#A0A8B8"
-                       HorizontalOptions="Center"
-                       HorizontalTextAlignment="Center"/>
+                <c:PageHeader Icon="🗺️"
+                              Title="Maps"
+                              Subtitle="Open a place in Google Maps when the chip is tapped."
+                              AccentColor="{StaticResource BrandMaps}"
+                              BackClicked="OnCancelClicked" />
+
+                <Border Style="{StaticResource Card}" Margin="0,28,0,0">
+                    <VerticalStackLayout>
+                        <Label Text="LOCATION" Style="{StaticResource FieldLabel}" />
+                        <Border Style="{StaticResource InputShell}">
+                            <Entry x:Name="LocationEntry"
+                                   Placeholder="Address, city or coordinates" />
+                        </Border>
+                        <Label Text="e.g. Knez Mihailova 1, Belgrade  ·  44.8176, 20.4569"
+                               Style="{StaticResource Hint}"
+                               Margin="2,10,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+
             </VerticalStackLayout>
+        </ScrollView>
 
-            <!-- Location Input -->
-            <Label Text="Location"
-                   FontSize="14"
-                   FontAttributes="Bold"
-                   TextColor="White"
-                   Margin="0,10,0,5"/>
-
-            <Entry x:Name="LocationEntry"
-                   Placeholder="Enter address, city, or coordinates"
-                   PlaceholderColor="#666666"
-                   TextColor="White"
-                   BackgroundColor="#1A2333"
-                   HeightRequest="50"
-                   Margin="0,0,0,15"/>
-
-            <!-- Write Button -->
+        <Border Grid.Row="1" Style="{StaticResource ActionBar}">
             <Button x:Name="WriteBtn"
-                    Text="💾 Write to NFC Chip"
-                    BackgroundColor="#4CAF50"
-                    TextColor="White"
-                    CornerRadius="16"
-                    HeightRequest="55"
-                    FontSize="16"
-                    FontAttributes="Bold"
-                    Margin="0,20,0,10"
-                    Clicked="OnWriteClicked"/>
-
-            <!-- Cancel Button -->
-            <Button x:Name="CancelBtn"
-                    Text="Cancel"
-                    BackgroundColor="#2A3448"
-                    TextColor="#A0A8B8"
-                    CornerRadius="16"
-                    HeightRequest="45"
-                    FontSize="14"
-                    Clicked="OnCancelClicked"/>
-
-        </VerticalStackLayout>
-    </ScrollView>
+                    Text="Write to NFC chip"
+                    Style="{StaticResource PrimaryButton}"
+                    Clicked="OnWriteClicked" />
+        </Border>
+    </Grid>
 </ContentPage>

@@ -1,67 +1,37 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:c="clr-namespace:Gumby.Controls"
              x:Class="Gumby.Views.InsertPlaylist"
-             Title="Insert Playlist"
-             BackgroundColor="#0A0E17"
+             Title="Media"
              Shell.NavBarIsVisible="False">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="0">
+        <VerticalStackLayout Style="{StaticResource PageContent}">
 
-            <!-- Header -->
-            <VerticalStackLayout Spacing="8" Margin="0,30,0,30" HorizontalOptions="Center">
-                <Label Text="🎵"
-                       FontSize="48"
-                       HorizontalOptions="Center"/>
-                <Label Text="INSERT PLAYLIST"
-                       FontSize="22"
-                       FontAttributes="Bold"
-                       TextColor="White"
-                       HorizontalOptions="Center"/>
-                <Label Text="Select platform for your playlist"
-                       FontSize="13"
-                       TextColor="#A0A8B8"
-                       HorizontalOptions="Center"
-                       HorizontalTextAlignment="Center"/>
+            <c:PageHeader Icon="🎵"
+                          Title="Media"
+                          Subtitle="Start your favourite playlist the moment you tap the chip."
+                          AccentColor="{StaticResource CatMedia}"
+                          BackClicked="OnCancelClicked" />
+
+            <VerticalStackLayout Spacing="12" Margin="0,28,0,0">
+
+                <c:ActionTile IsRow="True"
+                              Icon="▶️"
+                              Title="YouTube"
+                              Subtitle="Open a playlist in YouTube"
+                              AccentColor="{StaticResource BrandYouTube}"
+                              Clicked="OnYoutubeClicked" />
+
+                <c:ActionTile IsRow="True"
+                              Icon="🎧"
+                              Title="Spotify"
+                              Subtitle="Open a playlist in Spotify"
+                              AccentColor="{StaticResource BrandSpotify}"
+                              Clicked="OnSpotifyClicked" />
             </VerticalStackLayout>
-
-            <!-- YouTube Button -->
-            <Button x:Name="YoutubeBtn"
-                    Text="🎵 YouTube Playlist"
-                    BackgroundColor="#FF0000"
-                    TextColor="White"
-                    CornerRadius="16"
-                    HeightRequest="60"
-                    FontSize="16"
-                    FontAttributes="Bold"
-                    Margin="0,10,0,15"
-                    Clicked="OnYoutubeClicked"/>
-
-            <!-- Spotify Button -->
-            <Button x:Name="SpotifyBtn"
-                    Text="🎧 Spotify Playlist"
-                    BackgroundColor="#1DB954"
-                    TextColor="White"
-                    CornerRadius="16"
-                    HeightRequest="60"
-                    FontSize="16"
-                    FontAttributes="Bold"
-                    Margin="0,0,0,15"
-                    Clicked="OnSpotifyClicked"/>
-
-            <!-- Cancel Button -->
-            <Button x:Name="CancelBtn"
-                    Text="Cancel"
-                    BackgroundColor="#2A3448"
-                    TextColor="#A0A8B8"
-                    CornerRadius="16"
-                    HeightRequest="45"
-                    FontSize="14"
-                    Margin="0,20,0,10"
-                    Clicked="OnCancelClicked"/>
 
         </VerticalStackLayout>
     </ScrollView>
-
 </ContentPage>

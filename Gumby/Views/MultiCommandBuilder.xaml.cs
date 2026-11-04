@@ -41,7 +41,7 @@ namespace Gumby.Views
                 "💬 SMS",
                 "📞 Call",
                 "📶 WiFi",
-                "🩸 Bluetooth",
+                "🔵 Bluetooth",
                 "👤 Contact",
                 "⏰ Alarm",
                 "⏱️ Timer",
@@ -70,7 +70,7 @@ namespace Gumby.Views
                 case "📶 WiFi":
                     await AddWifiCommand();
                     break;
-                case "🩸 Bluetooth":
+                case "🔵 Bluetooth":
                     await AddBluetoothCommand();
                     break;
                 case "👤 Contact":
@@ -94,37 +94,37 @@ namespace Gumby.Views
         private async Task AddBluetoothCommand()
 {
     var action = await DisplayActionSheet("Bluetooth Action", "Cancel", null,
-        "🩸 Bluetooth On",
-        "🩸 Bluetooth Off",
-        "🩸 Bluetooth Toggle");
+        "🔵 Bluetooth On",
+        "🔵 Bluetooth Off",
+        "🔵 Bluetooth Toggle");
 
     if (action != null && action != "Cancel")
         await Gumby.Tasks.BluetoothTaskService.EnsurePermissionAsync();
 
     switch (action)
     {
-        case "🩸 Bluetooth On":
+        case "🔵 Bluetooth On":
             Commands.Add(new CommandItem
             {
                 Type = "BLUETOOTH",
                 Value = $"{CommandCodes.Bluetooth}|1",  // On
-                DisplayText = "🩸 Bluetooth ON"
+                DisplayText = "🔵 Bluetooth ON"
             });
             break;
-        case "🩸 Bluetooth Off":
+        case "🔵 Bluetooth Off":
             Commands.Add(new CommandItem
             {
                 Type = "BLUETOOTH",
                 Value = $"{CommandCodes.Bluetooth}|0",  // Off
-                DisplayText = "🩸 Bluetooth OFF"
+                DisplayText = "🔵 Bluetooth OFF"
             });
             break;
-        case "🩸 Bluetooth Toggle":
+        case "🔵 Bluetooth Toggle":
             Commands.Add(new CommandItem
             {
                 Type = "BLUETOOTH",
                 Value = $"{CommandCodes.Bluetooth}|2",  // Toggle
-                DisplayText = "🩸 Bluetooth TOGGLE"
+                DisplayText = "🔵 Bluetooth TOGGLE"
             });
             break;
     }

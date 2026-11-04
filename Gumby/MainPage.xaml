@@ -1,140 +1,174 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:c="clr-namespace:Gumby.Controls"
              x:Class="Gumby.MainPage"
-             Shell.NavBarIsVisible="False"
-             BackgroundColor="#0A0E17">
+             Shell.NavBarIsVisible="False">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="0">
+        <VerticalStackLayout Style="{StaticResource PageContent}">
 
-            <!-- Naslov -->
-            <Label Text="Gumby"
-                   FontSize="28"
-                   FontAttributes="Bold"
-                   TextColor="White"
-                   HorizontalOptions="Center"
-                   Margin="0,20,0,0"/>
+            <!-- Zaglavlje -->
+            <Grid ColumnDefinitions="*, Auto" Margin="0,8,0,0">
+                <VerticalStackLayout Spacing="6" VerticalOptions="Center">
+                    <Label Text="GUMBY"
+                           Style="{StaticResource Overline}"
+                           TextColor="{StaticResource Accent}" />
+                    <Label Text="What should your chip do?"
+                           Style="{StaticResource Display}"
+                           SemanticProperties.HeadingLevel="Level1" />
+                </VerticalStackLayout>
 
-            <Label Text="NFC Commander"
-                   FontSize="14"
-                   TextColor="#A0A8B8"
-                   HorizontalOptions="Center"
-                   Margin="0,0,0,20"/>
-
-            <!-- Opis -->
-            <Label Text="What would you like to create?"
-                   FontSize="16"
-                   FontAttributes="Bold"
-                   TextColor="White"
-                   HorizontalOptions="Center"/>
-
-            <Label Text="Tap any option to write to an NFC chip"
-                   FontSize="13"
-                   TextColor="#A0A8B8"
-                   HorizontalOptions="Center"
-                   Margin="0,5,0,25"/>
-
-            <!-- Grid dugmadi 3 kolone -->
-            <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto"
-                  ColumnDefinitions="*, *, *"
-                  RowSpacing="12"
-                  ColumnSpacing="12">
-
-                <!-- Red 1 -->
-                <Button Grid.Row="0" Grid.Column="0"
-                        x:Name="InsertPlaylistBtn"
-                        Text="🎵 Playlist"
-                        BackgroundColor="#1A2333"
-                        TextColor="White"
-                        CornerRadius="16"
-                        HeightRequest="90"
-                        FontSize="13"
-                        Clicked="OnInsertPlaylistClicked"/>
-
-                <Button Grid.Row="0" Grid.Column="1"
-                        x:Name="InsertRefsBtn"
-                        Text="🔗 Link / App"
-                        BackgroundColor="#1A2333"
-                        TextColor="White"
-                        CornerRadius="16"
-                        HeightRequest="90"
-                        FontSize="13"
-                        Clicked="OnInsertRefsClicked"/>
-
-                <Button Grid.Row="0" Grid.Column="2"
-                        x:Name="InsertPhoneBtn"
-                        Text="📞 Phone"
-                        BackgroundColor="#1A2333"
-                        TextColor="White"
-                        CornerRadius="16"
-                        HeightRequest="90"
-                        FontSize="13"
-                        Clicked="OnInsertPhoneClicked"/>
-
-                <!-- Red 2 -->
-                <Button Grid.Row="1" Grid.Column="0"
-                        x:Name="InsertClockBtn"
-                        Text="⏰ Clock"
-                        BackgroundColor="#1A2333"
-                        TextColor="White"
-                        CornerRadius="16"
-                        HeightRequest="90"
-                        FontSize="13"
-                        Clicked="OnInsertClockClicked"/>
-
-                <Button Grid.Row="1" Grid.Column="1"
-                        x:Name="InsertConnectionBtn"
-                        Text="🔌 Connect"
-                        BackgroundColor="#1A2333"
-                        TextColor="White"
-                        CornerRadius="16"
-                        HeightRequest="90"
-                        FontSize="13"
-                        Clicked="OnInsertConnectionClicked"/>
-
-                <Button Grid.Row="1" Grid.Column="2"
-                        x:Name="VolumeBtn"
-                        Text="🔊 Sound"
-                        BackgroundColor="#1A2333"
-                        TextColor="White"
-                        CornerRadius="16"
-                        HeightRequest="90"
-                        FontSize="13"
-                        Clicked="OnVolumeClicked"/>
-
-                <!-- Red 3 -->
-                <Button Grid.Row="2" Grid.Column="0"
-                        x:Name="InsertMultiCommandBtn"
-                        Text="🧩 Multi Task"
-                        BackgroundColor="#1A2333"
-                        TextColor="White"
-                        CornerRadius="16"
-                        HeightRequest="90"
-                        FontSize="13"
-                        Clicked="OnInsertMultiCommandClicked"/>
-
-                <!-- Red 4 - Settings dugme -->
-                <Button Grid.Row="2" Grid.Column="1"
-                        x:Name="SettingsBtn"
-                        Text="⚙️ Settings"
-                        BackgroundColor="#1A2333"
-                        TextColor="White"
-                        CornerRadius="16"
-                        HeightRequest="90"
-                        FontSize="13"
-                        Clicked="OnSettingsClicked"/>
-
+                <Button Grid.Column="1"
+                        Text="⚙"
+                        Style="{StaticResource IconButton}"
+                        VerticalOptions="Start"
+                        SemanticProperties.Description="Settings"
+                        Clicked="OnSettingsClicked" />
             </Grid>
 
-            <!-- Footer -->
-            <VerticalStackLayout Spacing="8" Margin="0,30,0,15">
-                <BoxView HeightRequest="1" BackgroundColor="#2A3448"/>
-                <Label Text="Gumby NFC Commander v1.0"
-                       FontSize="11"
-                       TextColor="#555555"
-                       HorizontalOptions="Center"/>
-            </VerticalStackLayout>
+            <Label Text="Pick an action, hold an NFC chip to your phone, and it runs every time you tap it."
+                   Style="{StaticResource Body}"
+                   Margin="0,10,0,0" />
+
+            <!-- Istaknuto: više komandi -->
+            <Border Background="{StaticResource HeroGradient}"
+                    Stroke="{StaticResource StrokeStrong}"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 26"
+                    Padding="20"
+                    Margin="0,24,0,0">
+                <Grid RowDefinitions="Auto, Auto, Auto, Auto" ColumnDefinitions="*, Auto">
+                    <Border Style="{StaticResource Pill}"
+                            BackgroundColor="{StaticResource AccentSoft}">
+                        <Label Text="ROUTINES"
+                               Style="{StaticResource Overline}"
+                               FontSize="11"
+                               TextColor="{StaticResource Accent}" />
+                    </Border>
+
+                    <Label Grid.Column="1" Grid.RowSpan="2"
+                           Text="🧩"
+                           FontSize="40"
+                           VerticalOptions="Start" />
+
+                    <Label Grid.Row="1"
+                           Text="One tap, many actions"
+                           Style="{StaticResource Heading}"
+                           FontSize="20"
+                           Margin="0,14,0,0" />
+
+                    <Label Grid.Row="2" Grid.ColumnSpan="2"
+                           Text="Turn on WiFi, set the volume and open an app — all from a single chip."
+                           Style="{StaticResource Caption}"
+                           Margin="0,6,0,0" />
+
+                    <Button Grid.Row="3" Grid.ColumnSpan="2"
+                            x:Name="InsertMultiCommandBtn"
+                            Text="Build a routine  →"
+                            Style="{StaticResource PrimaryButton}"
+                            HeightRequest="50"
+                            Margin="0,18,0,0"
+                            Clicked="OnInsertMultiCommandClicked" />
+                </Grid>
+            </Border>
+
+            <!-- Akcije -->
+            <Label Text="CREATE A TAG" Style="{StaticResource SectionTitle}" />
+
+            <Grid ColumnDefinitions="*, *"
+                  RowDefinitions="Auto, Auto, Auto"
+                  ColumnSpacing="12"
+                  RowSpacing="12">
+
+                <c:ActionTile Grid.Row="0" Grid.Column="0"
+                              Icon="🎵"
+                              Title="Media"
+                              Subtitle="YouTube and Spotify playlists"
+                              AccentColor="{StaticResource CatMedia}"
+                              Clicked="OnInsertPlaylistClicked" />
+
+                <c:ActionTile Grid.Row="0" Grid.Column="1"
+                              Icon="🔗"
+                              Title="Links &amp; apps"
+                              Subtitle="Websites, apps, Instagram and Maps"
+                              AccentColor="{StaticResource CatLink}"
+                              Clicked="OnInsertRefsClicked" />
+
+                <c:ActionTile Grid.Row="1" Grid.Column="0"
+                              Icon="📞"
+                              Title="Phone"
+                              Subtitle="Calls, messages and contacts"
+                              AccentColor="{StaticResource CatPhone}"
+                              Clicked="OnInsertPhoneClicked" />
+
+                <c:ActionTile Grid.Row="1" Grid.Column="1"
+                              Icon="⏰"
+                              Title="Clock"
+                              Subtitle="Alarms and timers"
+                              AccentColor="{StaticResource CatClock}"
+                              Clicked="OnInsertClockClicked" />
+
+                <c:ActionTile Grid.Row="2" Grid.Column="0"
+                              Icon="📶"
+                              Title="Connectivity"
+                              Subtitle="WiFi and Bluetooth"
+                              AccentColor="{StaticResource CatConnect}"
+                              Clicked="OnInsertConnectionClicked" />
+
+                <c:ActionTile Grid.Row="2" Grid.Column="1"
+                              Icon="🔊"
+                              Title="Sound"
+                              Subtitle="Volume, mute and vibrate"
+                              AccentColor="{StaticResource CatSound}"
+                              Clicked="OnVolumeClicked" />
+            </Grid>
+
+            <!-- Kako radi -->
+            <Label Text="HOW IT WORKS" Style="{StaticResource SectionTitle}" />
+
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="16">
+                    <Grid ColumnDefinitions="Auto, *" ColumnSpacing="14">
+                        <Border WidthRequest="30" HeightRequest="30"
+                                StrokeShape="RoundRectangle 15"
+                                BackgroundColor="{StaticResource AccentSoft}">
+                            <Label Text="1" FontFamily="OpenSansSemibold" FontSize="13"
+                                   TextColor="{StaticResource Accent}"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <Label Grid.Column="1" Text="Choose what the chip should do"
+                               Style="{StaticResource Caption}" VerticalOptions="Center" />
+                    </Grid>
+                    <Grid ColumnDefinitions="Auto, *" ColumnSpacing="14">
+                        <Border WidthRequest="30" HeightRequest="30"
+                                StrokeShape="RoundRectangle 15"
+                                BackgroundColor="{StaticResource AccentSoft}">
+                            <Label Text="2" FontFamily="OpenSansSemibold" FontSize="13"
+                                   TextColor="{StaticResource Accent}"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <Label Grid.Column="1" Text="Hold the chip to the back of your phone to write it"
+                               Style="{StaticResource Caption}" VerticalOptions="Center" />
+                    </Grid>
+                    <Grid ColumnDefinitions="Auto, *" ColumnSpacing="14">
+                        <Border WidthRequest="30" HeightRequest="30"
+                                StrokeShape="RoundRectangle 15"
+                                BackgroundColor="{StaticResource AccentSoft}">
+                            <Label Text="3" FontFamily="OpenSansSemibold" FontSize="13"
+                                   TextColor="{StaticResource Accent}"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <Label Grid.Column="1" Text="Tap the chip any time — the action runs instantly"
+                               Style="{StaticResource Caption}" VerticalOptions="Center" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="Gumby NFC Commander · v1.0"
+                   Style="{StaticResource Hint}"
+                   HorizontalOptions="Center"
+                   Margin="0,28,0,0" />
 
         </VerticalStackLayout>
     </ScrollView>

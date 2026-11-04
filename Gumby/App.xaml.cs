@@ -11,6 +11,9 @@ namespace Gumby
         public App()
         {
             InitializeComponent();
+
+            // Aplikacija je dizajnirana samo za tamnu temu (i sistemski dijalozi treba da je prate)
+            UserAppTheme = AppTheme.Dark;
         }
 
         protected override Window CreateWindow(IActivationState? activationState)

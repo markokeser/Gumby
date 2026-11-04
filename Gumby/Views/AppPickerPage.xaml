@@ -1,65 +1,66 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:c="clr-namespace:Gumby.Controls"
+             xmlns:views="clr-namespace:Gumby.Views"
              x:Class="Gumby.Views.AppPickerPage"
-             Title="Select App"
-             BackgroundColor="#152B42">
+             Title="Choose an app"
+             Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto, *">
+    <Grid RowDefinitions="Auto, Auto, *">
 
-        <!-- Header -->
-        <VerticalStackLayout Grid.Row="0" Padding="20" Spacing="10">
+        <c:PageHeader Grid.Row="0"
+                      Margin="20,8,20,0"
+                      Icon="📱"
+                      Title="Choose an app"
+                      AccentColor="{StaticResource CatConnect}"
+                      BackClicked="OnBackClicked" />
+
+        <Border Grid.Row="1"
+                Style="{StaticResource InputShell}"
+                Padding="4,0"
+                Margin="20,20,20,12">
             <SearchBar x:Name="SearchBar"
-                       Placeholder="Search apps..."
-                       BackgroundColor="#2A4A6B"
-                       TextColor="White"
-                       CancelButtonColor="White"/>
-        </VerticalStackLayout>
+                       Placeholder="Search apps" />
+        </Border>
 
-        <!-- Apps List -->
         <CollectionView x:Name="AppsCollectionView"
-                        Grid.Row="1"
+                        Grid.Row="2"
                         SelectionMode="Single"
-                        Margin="10,0,10,10">
-
+                        Margin="20,0,20,0">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
+            </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Grid ColumnDefinitions="Auto, *"
-                          Padding="10,8"
-                          ColumnSpacing="12">
-
-                        <!-- App Icon -->
-                        <Label Grid.Column="0"
-                               Text="📱"
-                               FontSize="25"
-                               VerticalOptions="Center"/>
-
-                        <!-- App Name and Package -->
-                        <VerticalStackLayout Grid.Column="1"
-                                             VerticalOptions="Center">
-                            <Label Text="{Binding AppName}"
-                                   FontSize="16"
-                                   FontAttributes="Bold"
-                                   TextColor="White"/>
-                            <Label Text="{Binding PackageName}"
-                                   FontSize="11"
-                                   TextColor="#888888"
-                                   LineBreakMode="TailTruncation"/>
-                        </VerticalStackLayout>
-
-                    </Grid>
+                <DataTemplate x:DataType="views:AppInfo">
+                    <Border Style="{StaticResource Card}" Padding="12">
+                        <Grid ColumnDefinitions="Auto, *" ColumnSpacing="14">
+                            <Border WidthRequest="42" HeightRequest="42"
+                                    StrokeShape="RoundRectangle 13"
+                                    BackgroundColor="{StaticResource SurfaceRaised}">
+                                <Label Text="📱" FontSize="20"
+                                       HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                <Label Text="{Binding AppName}"
+                                       FontFamily="OpenSansSemibold"
+                                       FontSize="15"
+                                       LineBreakMode="TailTruncation" />
+                                <Label Text="{Binding PackageName}"
+                                       Style="{StaticResource Hint}"
+                                       LineBreakMode="TailTruncation" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <!-- Loading Indicator -->
         <ActivityIndicator x:Name="LoadingIndicator"
-                           Grid.Row="1"
+                           Grid.Row="2"
                            IsRunning="True"
                            IsVisible="True"
-                           Color="White"
                            VerticalOptions="Center"
-                           HorizontalOptions="Center"/>
-
+                           HorizontalOptions="Center" />
     </Grid>
 </ContentPage>
