@@ -20,6 +20,9 @@ namespace Gumby.Views
         {
             InitializeComponent();
             _returnToCaller = returnToCaller;
+
+            if (returnToCaller)
+                ModeHintLabel.Text = "Choosing an option adds it as a step to your routine.";
         }
 
         // Ringtone Volume

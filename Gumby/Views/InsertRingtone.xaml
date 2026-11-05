@@ -80,7 +80,8 @@
                 </VerticalStackLayout>
             </Border>
 
-            <Label Text="Choosing an option takes you straight to writing the chip."
+            <Label x:Name="ModeHintLabel"
+                   Text="Choosing an option takes you straight to writing the chip."
                    Style="{StaticResource Hint}"
                    HorizontalOptions="Center"
                    HorizontalTextAlignment="Center"

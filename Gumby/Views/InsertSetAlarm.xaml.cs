@@ -29,6 +29,10 @@ public partial class InsertSetAlarm : ContentPage
         HourPicker.SelectedIndex = DateTime.Now.Hour;
         MinutePicker.SelectedIndex = DateTime.Now.Minute;
         _returnToCaller = returnToCaller;
+
+        // Iz Multi Task-a se korak samo dodaje u listu - upis na čip je tek na kraju
+        if (returnToCaller)
+            WriteBtn.Text = "Add step";
     }
 
     private void OnAMClicked(object sender, EventArgs e)

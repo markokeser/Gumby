@@ -31,104 +31,97 @@ namespace Gumby.Views
             }
         }
 
-            private async void OnAddTaskClicked(object sender, EventArgs e)
-        {
-            var action = await DisplayActionSheet("Select Command Type", "Cancel", null,
-                "🔗 Link",
-                "🔊 Volume",
-                "🔇 Mute",
-                "📳 Vibrate",
-                "💬 SMS",
-                "📞 Call",
-                "📶 WiFi",
-                "🔵 Bluetooth",
-                "👤 Contact",
-                "⏰ Alarm",
-                "⏱️ Timer",
-                "📱 Open App");
+        private bool _pickingStep;
 
-            switch (action)
+        private async void OnAddTaskClicked(object sender, EventArgs e)
+        {
+            if (_pickingStep)
+                return;
+
+            _pickingStep = true;
+            try
             {
-                case "🔗 Link":
-                    await AddLinkCommand();
-                    break;
-                case "🔊 Volume":
-                    await AddVolumeCommand();
-                    break;
-                case "🔇 Mute":
-                    AddMuteCommand();
-                    break;
-                case "📳 Vibrate":
-                    AddVibrateCommand();
-                    break;
-                case "💬 SMS":
-                    await AddSmsCommand();
-                    break;
-                case "📞 Call":
-                    await AddCallCommand();
-                    break;
-                case "📶 WiFi":
-                    await AddWifiCommand();
-                    break;
-                case "🔵 Bluetooth":
-                    await AddBluetoothCommand();
-                    break;
-                case "👤 Contact":
-                    await AddContactCommand();
-                    break;
-                case "⏰ Alarm":
-                    await AddAlarmCommand();
-                    break;
-                case "⏱️ Timer":
-                    await AddTimerCommand();
-                    break;
-                case "📱 Open App":
-                    await AddOpenAppCommand();
-                    break;
+                var step = await StepPickerPage.PickAsync(Navigation);
+
+                switch (step)
+                {
+                    case "volume": await AddVolumeCommand(); break;
+                    case "mute": AddMuteCommand(); break;
+                    case "vibrate": AddVibrateCommand(); break;
+
+                    case "wifi": await AddWifiCommand(); break;
+                    case "bt_on": await AddBluetoothCommand("1", "🔵 Bluetooth on"); break;
+                    case "bt_off": await AddBluetoothCommand("0", "⚪ Bluetooth off"); break;
+                    case "bt_toggle": await AddBluetoothCommand("2", "🔁 Bluetooth toggle"); break;
+
+                    case "app": await AddOpenAppCommand(); break;
+                    case "link": await AddLinkCommand(); break;
+                    case "maps": await AddMapsCommand(); break;
+
+                    case "spotify": await AddSpotifyCommand(); break;
+                    case "youtube": await AddYoutubeCommand(); break;
+                    case "instagram": await AddInstagramCommand(); break;
+
+                    case "call": await AddCallCommand(); break;
+                    case "sms": await AddSmsCommand(); break;
+                    case "contact": await AddContactCommand(); break;
+
+                    case "alarm": await AddAlarmCommand(); break;
+                    case "timer": await AddTimerCommand(); break;
+                }
+            }
+            finally
+            {
+                _pickingStep = false;
             }
         }
 
+        // ========== METODE ZA DODAVANJE KORAKA ==========
 
-        // ========== NOVE METODE ZA OT VARANJE INSERT STRANICA ==========
-
-        private async Task AddBluetoothCommand()
-{
-    var action = await DisplayActionSheet("Bluetooth Action", "Cancel", null,
-        "🔵 Bluetooth On",
-        "🔵 Bluetooth Off",
-        "🔵 Bluetooth Toggle");
-
-    if (action != null && action != "Cancel")
-        await Gumby.Tasks.BluetoothTaskService.EnsurePermissionAsync();
-
-    switch (action)
-    {
-        case "🔵 Bluetooth On":
+        private void AddStep(string type, string value, string displayText)
+        {
             Commands.Add(new CommandItem
             {
-                Type = "BLUETOOTH",
-                Value = $"{CommandCodes.Bluetooth}|1",  // On
-                DisplayText = "🔵 Bluetooth ON"
+                Type = type,
+                Value = value,
+                DisplayText = displayText
             });
-            break;
-        case "🔵 Bluetooth Off":
-            Commands.Add(new CommandItem
-            {
-                Type = "BLUETOOTH",
-                Value = $"{CommandCodes.Bluetooth}|0",  // Off
-                DisplayText = "🔵 Bluetooth OFF"
-            });
-            break;
-        case "🔵 Bluetooth Toggle":
-            Commands.Add(new CommandItem
-            {
-                Type = "BLUETOOTH",
-                Value = $"{CommandCodes.Bluetooth}|2",  // Toggle
-                DisplayText = "🔵 Bluetooth TOGGLE"
-            });
-            break;
-    }
-}
+        }
+
+        private async Task AddBluetoothCommand(string mode, string displayText)
+        {
+            await Gumby.Tasks.BluetoothTaskService.EnsurePermissionAsync();
+            AddStep("BLUETOOTH", $"{CommandCodes.Bluetooth}|{mode}", displayText);
+        }
+
+        private async Task AddMapsCommand()
+        {
+            var page = new InsertGoogleMaps(returnToCaller: true);
+            page.OnValueReturn = (command, displayText) => AddStep("MAPS", command, displayText);
+            await Navigation.PushAsync(page);
+        }
+
+        private async Task AddSpotifyCommand()
+        {
+            var page = new InsertSpotifyPlaylist(returnToCaller: true);
+            page.OnValueReturn = (command, displayText) => AddStep("SPOTIFY", command, displayText);
+            await Navigation.PushAsync(page);
+        }
+
+        private async Task AddYoutubeCommand()
+        {
+            var page = new InsertYoutubePlaylist(returnToCaller: true);
+            page.OnValueReturn = (command, displayText) => AddStep("YOUTUBE", command, displayText);
+            await Navigation.PushAsync(page);
+        }
+
+        private async Task AddInstagramCommand()
+        {
+            var page = new InsertInstagram(returnToCaller: true);
+            page.OnValueReturn = (command, displayText) => AddStep("INSTAGRAM", command, displayText);
+            await Navigation.PushAsync(page);
+        }
+
         private async Task AddLinkCommand()
         {
             var linkPage = new InsertLink(returnToCaller: true);

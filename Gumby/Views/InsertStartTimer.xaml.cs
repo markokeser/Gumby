@@ -43,6 +43,10 @@ public partial class InsertStartTimer : ContentPage
 
         UpdateDurationLabel();
         _returnToCaller = returnToCaller;
+
+        // Iz Multi Task-a se korak samo dodaje u listu - upis na čip je tek na kraju
+        if (returnToCaller)
+            WriteBtn.Text = "Add step";
     }
 
     private void OnTimeChanged(object sender, EventArgs e)
