@@ -19,6 +19,10 @@ public partial class InsertOpenApp : ContentPage
     {
         InitializeComponent();
         _returnToCaller = returnToCaller;
+
+        // Iz Multi Task-a se korak samo dodaje u listu - upis na čip je tek na kraju
+        if (returnToCaller)
+            WriteBtn.Text = "Add step";
     }
 
     private async void OnSelectAppClicked(object sender, EventArgs e)

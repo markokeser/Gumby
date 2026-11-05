@@ -35,6 +35,10 @@ namespace Gumby.Views
             PasswordEntry.BindingContext = this;
             ShowPasswordCheck.CheckedChanged += OnShowPasswordCheckedChanged;
             _returnToCaller = returnToCaller;
+
+            // Iz Multi Task-a se korak samo dodaje u listu - upis na čip je tek na kraju
+            if (returnToCaller)
+                WriteBtn.Text = "Add step";
         }
 
         private void OnShowPasswordTapped(object sender, EventArgs e)

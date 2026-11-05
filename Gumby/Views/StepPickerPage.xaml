@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:c="clr-namespace:Gumby.Controls"
+             x:Class="Gumby.Views.StepPickerPage"
+             Title="Add a step"
+             Shell.NavBarIsVisible="False">
+
+    <ScrollView>
+        <VerticalStackLayout Style="{StaticResource PageContent}">
+
+            <c:PageHeader Icon="➕"
+                          Title="Add a step"
+                          Subtitle="Choose what this step of your routine should do."
+                          AccentColor="{StaticResource CatMulti}"
+                          BackClicked="OnBackClicked" />
+
+            <!-- Zvuk -->
+            <Label Text="SOUND" Style="{StaticResource SectionTitle}" />
+            <VerticalStackLayout Spacing="10">
+                <c:ActionTile IsRow="True" ClassId="volume"
+                              Icon="🔊" Title="Volume"
+                              Subtitle="Set ringtone or media volume"
+                              AccentColor="{StaticResource CatSound}"
+                              Clicked="OnStepClicked" />
+                <Grid ColumnDefinitions="*, *" ColumnSpacing="10">
+                    <c:ActionTile Grid.Column="0" ClassId="mute"
+                                  Icon="🔇" Title="Mute"
+                                  AccentColor="{StaticResource Danger}"
+                                  Clicked="OnStepClicked" />
+                    <c:ActionTile Grid.Column="1" ClassId="vibrate"
+                                  Icon="📳" Title="Vibrate"
+                                  AccentColor="{StaticResource CatMedia}"
+                                  Clicked="OnStepClicked" />
+                </Grid>
+            </VerticalStackLayout>
+
+            <!-- Povezivanje -->
+            <Label Text="CONNECTIVITY" Style="{StaticResource SectionTitle}" />
+            <VerticalStackLayout Spacing="10">
+                <c:ActionTile IsRow="True" ClassId="wifi"
+                              Icon="📶" Title="Connect to WiFi"
+                              Subtitle="Join a network with its password"
+                              AccentColor="{StaticResource CatConnect}"
+                              Clicked="OnStepClicked" />
+                <Grid ColumnDefinitions="*, *, *" ColumnSpacing="10">
+                    <c:ActionTile Grid.Column="0" ClassId="bt_on"
+                                  Icon="🔵" Title="BT on"
+                                  AccentColor="{StaticResource CatConnect}"
+                                  Clicked="OnStepClicked" />
+                    <c:ActionTile Grid.Column="1" ClassId="bt_off"
+                                  Icon="⚪" Title="BT off"
+                                  AccentColor="{StaticResource CatSettings}"
+                                  Clicked="OnStepClicked" />
+                    <c:ActionTile Grid.Column="2" ClassId="bt_toggle"
+                                  Icon="🔁" Title="BT toggle"
+                                  AccentColor="{StaticResource CatMedia}"
+                                  Clicked="OnStepClicked" />
+                </Grid>
+            </VerticalStackLayout>
+
+            <!-- Aplikacije i linkovi -->
+            <Label Text="APPS &amp; LINKS" Style="{StaticResource SectionTitle}" />
+            <VerticalStackLayout Spacing="10">
+                <c:ActionTile IsRow="True" ClassId="app"
+                              Icon="📱" Title="Open app"
+                              Subtitle="Launch an installed app"
+                              AccentColor="{StaticResource CatConnect}"
+                              Clicked="OnStepClicked" />
+                <c:ActionTile IsRow="True" ClassId="link"
+                              Icon="🌐" Title="Website"
+                              Subtitle="Open a link in the browser"
+                              AccentColor="{StaticResource CatLink}"
+                              Clicked="OnStepClicked" />
+                <c:ActionTile IsRow="True" ClassId="maps"
+                              Icon="🗺️" Title="Maps"
+                              Subtitle="Open a place in Google Maps"
+                              AccentColor="{StaticResource BrandMaps}"
+                              Clicked="OnStepClicked" />
+            </VerticalStackLayout>
+
+            <!-- Mediji -->
+            <Label Text="MEDIA" Style="{StaticResource SectionTitle}" />
+            <Grid ColumnDefinitions="*, *, *" ColumnSpacing="10">
+                <c:ActionTile Grid.Column="0" ClassId="spotify"
+                              Icon="🎧" Title="Spotify"
+                              AccentColor="{StaticResource BrandSpotify}"
+                              Clicked="OnStepClicked" />
+                <c:ActionTile Grid.Column="1" ClassId="youtube"
+                              Icon="▶️" Title="YouTube"
+                              AccentColor="{StaticResource BrandYouTube}"
+                              Clicked="OnStepClicked" />
+                <c:ActionTile Grid.Column="2" ClassId="instagram"
+                              Icon="📸" Title="Reel"
+                              AccentColor="{StaticResource BrandInstagram}"
+                              Clicked="OnStepClicked" />
+            </Grid>
+
+            <!-- Telefon -->
+            <Label Text="PHONE" Style="{StaticResource SectionTitle}" />
+            <VerticalStackLayout Spacing="10">
+                <c:ActionTile IsRow="True" ClassId="call"
+                              Icon="📞" Title="Call"
+                              Subtitle="Dial a number"
+                              AccentColor="{StaticResource CatPhone}"
+                              Clicked="OnStepClicked" />
+                <c:ActionTile IsRow="True" ClassId="sms"
+                              Icon="💬" Title="Text message"
+                              Subtitle="Send an SMS"
+                              AccentColor="{StaticResource CatConnect}"
+                              Clicked="OnStepClicked" />
+                <c:ActionTile IsRow="True" ClassId="contact"
+                              Icon="👤" Title="Contact card"
+                              Subtitle="Offer a contact to save"
+                              AccentColor="{StaticResource CatMedia}"
+                              Clicked="OnStepClicked" />
+            </VerticalStackLayout>
+
+            <!-- Sat -->
+            <Label Text="CLOCK" Style="{StaticResource SectionTitle}" />
+            <Grid ColumnDefinitions="*, *" ColumnSpacing="10">
+                <c:ActionTile Grid.Column="0" ClassId="alarm"
+                              Icon="⏰" Title="Alarm"
+                              Subtitle="Set a wake-up time"
+                              AccentColor="{StaticResource CatClock}"
+                              Clicked="OnStepClicked" />
+                <c:ActionTile Grid.Column="1" ClassId="timer"
+                              Icon="⏱️" Title="Timer"
+                              Subtitle="Start a countdown"
+                              AccentColor="{StaticResource CatMulti}"
+                              Clicked="OnStepClicked" />
+            </Grid>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
